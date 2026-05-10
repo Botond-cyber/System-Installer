@@ -1,0 +1,21 @@
+import platform as py_platform
+
+class LinuxPlatform:
+    def resolve(self, actions):
+        return actions.get("linux", {}).get("fedora", [])
+
+
+class WindowsPlatform:
+    def resolve(self, actions):
+        return actions.get("windows", [])
+
+
+def get_platform():
+    system = py_platform.system().lower()
+
+    if system == "linux":
+        return LinuxPlatform()
+    elif system == "windows":
+        return WindowsPlatform()
+    else:
+        raise Exception("Unsupported OS")

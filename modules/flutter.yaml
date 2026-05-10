@@ -1,0 +1,9 @@
+name: flutter
+
+actions:
+  install:
+    linux:
+      fedora:
+        - echo "Flutter install step placeholder"
+    windows:
+      - winget install Google.Flutter
