@@ -1,5 +1,9 @@
 name: flutter
 
+depends:
+  - git
+  - unzip
+
 actions:
   install:
     linux:

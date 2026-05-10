@@ -1,8 +1,10 @@
 import platform as py_platform
+import distro
+
 
 class LinuxPlatform:
     def resolve(self, actions):
-        return actions.get("linux", {}).get("fedora", [])
+        return actions.get("linux", {}).get(distro.id(), [])
 
 
 class WindowsPlatform:
