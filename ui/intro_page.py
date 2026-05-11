@@ -24,9 +24,10 @@ class IntroScreen(Screen):
                 yield RadioButton(p.removesuffix(".yaml").capitalize())
             yield RadioButton("Custom")
 
-    def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
+    async def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
         self.ctx.selected_profile = event.pressed.label.plain
-        
+        await self.app.switch_screen("main_screen")
+
     def getProfiles(self, directory):
         profiles = [
             f for f in listdir(directory) if path.isfile(path.join(directory, f))
