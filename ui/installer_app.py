@@ -1,5 +1,5 @@
 from pathlib import PurePath
-from typing import List, Type
+from typing import List
 
 from textual.app import App
 from textual.driver import Driver

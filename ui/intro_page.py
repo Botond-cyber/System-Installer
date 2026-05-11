@@ -26,7 +26,7 @@ class IntroScreen(Screen):
 
     def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
         self.ctx.selected_profile = event.pressed.label.plain
-
+        
     def getProfiles(self, directory):
         profiles = [
             f for f in listdir(directory) if path.isfile(path.join(directory, f))
