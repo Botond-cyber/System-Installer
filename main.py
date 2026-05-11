@@ -2,16 +2,16 @@ import sys
 
 from core.engine import Engine
 from core.context import Context
+from ui.installer_app import InstallerApp
 
 
 def main():
     ctx = Context()
     engine = Engine(ctx)
 
-    # for now: hardcoded test module
     if len(sys.argv) < 2:
-        print("Usage: installer <module1> <module2> ...")
-        return
+        app = InstallerApp()
+        app.run()
 
     modules = sys.argv[1:]
 

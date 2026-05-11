@@ -1,0 +1,12 @@
+name: school
+
+modules:
+  - git
+  - flutter
+
+config:
+  windows:
+    - echo "windows config"
+
+  linux:
+    - echo "linux config"
