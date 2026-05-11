@@ -1,0 +1,10 @@
+Screen {
+    align: center middle;
+}
+RadioSet{
+    margin-top:1;
+    width: auto;
+}
+RadioButton{
+    width: 60;
+}
