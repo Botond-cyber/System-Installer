@@ -1,14 +1,19 @@
+from os import listdir, path
+
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import Label, Button, RadioButton, RadioSet
+from textual.widgets import Label, RadioButton, RadioSet
 
 from ui.assets.title import title
-from os import listdir, path
 
 
 class IntroScreen(Screen):
     CSS_PATH = "assets/intro.tcss"
     directory = "profiles/"
+
+    @property
+    def ctx(self):
+        return getattr(self.app, "ctx")
 
     def compose(self) -> ComposeResult:
         yield Label(title)
@@ -18,6 +23,9 @@ class IntroScreen(Screen):
             for p in profiles:
                 yield RadioButton(p.removesuffix(".yaml").capitalize())
             yield RadioButton("Custom")
+
+    def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
+        self.ctx.selected_profile = event.pressed.label.plain
 
     def getProfiles(self, directory):
         profiles = [

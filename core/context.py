@@ -5,6 +5,7 @@ class Context:
     def __init__(self):
         self.state = {}
         self.installed = set()
+        self.selected_profile = None
 
     def run(self, command: str):
         print(f"▶ {command}")
