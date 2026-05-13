@@ -1,29 +1,18 @@
 MainScreen {
-    layout: grid;
-    grid-size: 2;
-    grid-columns: 0.5fr 2fr;
-    grid-rows:2fr 1fr;
+    align: center middle;
 }
 SelectionList{
     row-span: 2;
-    height: 100%;
+    width:50;
+    align: center middle;
+}
+Vertical{
+    align: center middle;
+
 }
 Header{
     margin-bottom:1
 }
 Footer{
     margin-top: 1
-}
-Static{
-    align: center middle;
-    layout: grid;
-    grid-gutter: 1;
-    grid-size: 2;
-}
-Button{
-    width: 100%;
-}
-#install{
-    column-span: 2;
-
 }

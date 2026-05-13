@@ -1,8 +1,12 @@
-from os import listdir, path
+import subprocess
+from os import name
 
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import Label, SelectionList, Header, Footer, Markdown, Button, Static
+from textual.widgets import Label, SelectionList, Header, Footer, Button
+from textual.containers import Vertical
+
+from core.loader import getModules
 
 
 class MainScreen(Screen):
@@ -12,24 +16,29 @@ class MainScreen(Screen):
     @property
     def ctx(self):
         return getattr(self.app, "ctx")
+    @property
+    def engine(self):
+        return getattr(self.app, "engine")
 
     def compose(self) -> ComposeResult:
         yield Header()
-        modules = self.getModules(self.directory)
-        yield SelectionList[int](*modules)
-        yield Markdown()
-        with Static():
+        with Vertical():
+            yield Label("Choose modules to install:")
+            modules = getModules(self.directory)
+            yield SelectionList[int](*modules)
             yield Button("Select all")
             yield Button("Reset")
             yield Button("Install", id="install")
         yield Footer()
 
     def on_mount(self) -> None:
+        print(self.ctx.selected_profile)
         self.title = f"{self.ctx.selected_profile} installer"
+        
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "install":
+            self.app.exit(str(event.button))
+            subprocess.run('cls' if name == 'nt' else 'clear', shell=True)
+            self.engine.install("vscode")
 
-    def getModules(self, directory):
-        modules = []
-        for idx, f in enumerate(listdir(directory)):
-            if path.isfile(path.join(directory, f)):
-                modules.append((f.removesuffix(".yaml").capitalize(), idx))
-        return tuple(modules)
+    

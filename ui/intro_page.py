@@ -14,7 +14,6 @@ class IntroScreen(Screen):
     @property
     def ctx(self):
         return getattr(self.app, "ctx")
-
     def compose(self) -> ComposeResult:
         yield Label(title)
         yield Label("Choose profile to install:")

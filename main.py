@@ -10,7 +10,7 @@ def main():
     engine = Engine(ctx)
 
     if len(sys.argv) < 2:
-        app = InstallerApp(ctx)
+        app = InstallerApp(ctx, engine)
         app.run()
 
     modules = sys.argv[1:]

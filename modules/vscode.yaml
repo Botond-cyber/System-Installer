@@ -1,0 +1,11 @@
+name: vscode
+
+
+
+actions:
+  install:
+    linux:
+      fedora:
+        - echo "Flutter install step placeholder"
+    windows:
+        - winget install -e --id Microsoft.VisualStudioCode --scope user
