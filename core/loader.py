@@ -18,7 +18,7 @@ def getModules(directory, profile):
         return tuple(modules)
 
 def getModulesFromProfile(profile):
-    if profile == "custom":
+    if profile == "Custom":
         return []
     else:
         path = f"profiles/{profile}.yaml"
