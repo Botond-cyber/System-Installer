@@ -3,7 +3,7 @@ from os import name
 
 from textual.app import ComposeResult
 from textual.screen import Screen
-from textual.widgets import Label, SelectionList, Header, Footer, Button
+from textual.widgets import Label, SelectionList, Header, Footer, Button, Static
 from textual.containers import Vertical
 
 from core.loader import getModules
@@ -22,13 +22,18 @@ class MainScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header()
-        with Vertical():
-            yield Label("Choose modules to install:")
-            modules = getModules(self.directory)
-            yield SelectionList[int](*modules)
-            yield Button("Select all")
-            yield Button("Reset")
-            yield Button("Install", id="install")
+        
+        with Static(id="grid-container"):
+            with Static(id="modules-pane"):
+                yield Label("Choose modules to install:")
+                modules = getModules(self.directory)
+                yield SelectionList[int](*modules)
+
+            with Vertical(id="actions-pane"):
+                yield Button("Select all")
+                yield Button("Reset")
+                yield Button("Install", id="install")
+
         yield Footer()
 
     def on_mount(self) -> None:

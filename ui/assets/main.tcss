@@ -1,15 +1,29 @@
 MainScreen {
     align: center middle;
 }
-SelectionList{
-    row-span: 2;
-    width:50;
-    align: center middle;
+#grid-container {
+    layout: horizontal;
+    height: 100%;
+    width: 100%;
 }
-Vertical{
-    align: center middle;
 
+#modules-pane {
+    width: 1fr;
+    height: 100%;
 }
+
+#actions-pane {
+    width: 24;
+    height: 100%;
+    margin-left: 2;
+    align: center middle;
+}
+
+SelectionList {
+    width: 100%;
+    height: 1fr;
+}
+
 Header{
     margin-bottom:1
 }
