@@ -6,7 +6,7 @@ from textual.screen import Screen
 from textual.widgets import Label, SelectionList, Header, Footer, Button, Static
 from textual.containers import Vertical
 
-from core.loader import getModules
+from core.loader import getModules, getModulesFromProfile
 
 
 class MainScreen(Screen):
@@ -25,8 +25,8 @@ class MainScreen(Screen):
         
         with Static(id="grid-container"):
             with Static(id="modules-pane"):
-                yield Label("Choose modules to install:")
-                modules = getModules(self.directory)
+                yield Label(" Choose modules to install:", id="title")
+                modules = getModules(self.directory, self.ctx.selected_profile)
                 yield SelectionList[int](*modules)
 
             with Vertical(id="actions-pane"):

@@ -18,7 +18,9 @@ MainScreen {
     margin-left: 2;
     align: center middle;
 }
-
+#title{
+    margin-bottom: 1;
+}
 SelectionList {
     width: 100%;
     height: 1fr;

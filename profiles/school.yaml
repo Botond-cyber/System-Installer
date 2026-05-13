@@ -3,6 +3,7 @@ name: school
 modules:
   - git
   - flutter
+  - vscode
 
 config:
   windows:
