@@ -44,6 +44,6 @@ class MainScreen(Screen):
         if event.button.id == "install":
             self.app.exit(str(event.button))
             subprocess.run('cls' if name == 'nt' else 'clear', shell=True)
-            self.engine.install("vscode")
+            self.engine.install("powertoys")
 
     

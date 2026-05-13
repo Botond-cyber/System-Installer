@@ -1,0 +1,6 @@
+name: vscode
+
+actions:
+  install:
+    windows:
+        - winget install -e --id Microsoft.PowerToys --scope user
