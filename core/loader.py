@@ -21,6 +21,6 @@ def getModulesFromProfile(profile):
     if profile == "Custom":
         return []
     else:
-        path = f"profiles/{profile}.yaml"
+        path = f"profiles/{profile.lower()}.yaml"
         with open(path, "r") as f:
             return( yaml.safe_load(f)["modules"])

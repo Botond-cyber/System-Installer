@@ -1,6 +1,3 @@
-MainScreen {
-    align: center middle;
-}
 #grid-container {
     layout: horizontal;
     height: 100%;
@@ -23,6 +20,14 @@ MainScreen {
 }
 SelectionList {
     width: 100%;
+    height: 1fr;
+}
+
+TabbedContent {
+    height: 1fr;
+}
+
+TabPane {
     height: 1fr;
 }
 
