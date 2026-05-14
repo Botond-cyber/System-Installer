@@ -18,6 +18,10 @@ from textual.containers import Vertical
 from core.loader import getModules
 
 
+class NextTabButton(Button):
+    FOCUS_ON_CLICK = False
+
+
 class MainScreen(Screen):
     CSS_PATH = "assets/main.tcss"
     directory = "modules/"
@@ -43,7 +47,8 @@ class MainScreen(Screen):
                         yield Button("Select all")
                         yield Button("Deselect all")
                         yield Button("Reset")
-            with TabPane(title="Scripts"):
+                        yield NextTabButton("Next->", id="nextScripts")
+            with TabPane(title="Scripts", id="scripts"):
                 with Static(id="grid-container"):
                     with Static(id="modules-pane"):
                         yield Label(" Choose modules to install:", id="title")
@@ -54,8 +59,9 @@ class MainScreen(Screen):
                         yield Button("Select all")
                         yield Button("Deselect all")
                         yield Button("Reset")
+                        yield NextTabButton("Next->", id="nextInstall")
 
-            with TabPane(title="Overview"):
+            with TabPane(title="Overview", id="install"):
                 with Static(id="grid-container"):
                     with Static(id="modules-pane"):
                         yield Label(" Choose modules to install:", id="title")
@@ -75,3 +81,13 @@ class MainScreen(Screen):
             self.app.exit(str(event.button))
             subprocess.run("cls" if name == "nt" else "clear", shell=True)
             self.engine.install("powertoys")
+
+        if event.button.id == "nextScripts":
+            self.action_show_tab("scripts")
+        
+        if event.button.id == "nextInstall":
+            self.action_show_tab("install")
+    
+    def action_show_tab(self, tab: str) -> None:
+        """Switch to a new tab."""
+        self.get_child_by_type(TabbedContent).active = tab
