@@ -1,4 +1,4 @@
-from core.loader import load_module
+from core.loader import load_module_or_script
 from core.platform import get_platform
 
 
@@ -11,7 +11,7 @@ class Engine:
         if self.ctx.is_installed(module_name):
             return
         try:
-            module = load_module(module_name)
+            module = load_module_or_script(module_name)
         except:
             print(f"❌ Module {module_name} not found")
             return

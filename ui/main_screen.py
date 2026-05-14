@@ -13,17 +13,19 @@ from textual.widgets import (
 )
 from textual.containers import Vertical
 
-from core.loader import getModules, getModulesFromProfile
+from core.loader import get_modules_or_scripts, get_modules_or_scrips_from_profile
 
 
 class MainScreen(Screen):
     CSS_PATH = "assets/main.tcss"
-    directory = "modules/"
+    modules_directory = "modules/"
+    scripts_directory = "scripts/"
 
     def __init__(
         self, name: str | None = None, id: str | None = None, classes: str | None = None
     ) -> None:
         self.modules = ()
+        self.scripts = ()
         self.preSelectedModules = ()
         self.dependencies = []
         super().__init__(name, id, classes)
@@ -37,13 +39,19 @@ class MainScreen(Screen):
         return getattr(self.app, "engine")
 
     def compose(self) -> ComposeResult:
-        self.modules = getModules(self.directory)
-        self.preSelectedModules = getModulesFromProfile(self.ctx.selected_profile)
+        self.modules = get_modules_or_scripts(self.modules_directory)
+        self.scripts = get_modules_or_scripts(self.scripts_directory)
+        self.pre_selected_modules = get_modules_or_scrips_from_profile(
+            self.ctx.selected_profile, "modules/"
+        )
+        self.pre_selected_scripts = get_modules_or_scrips_from_profile(
+            self.ctx.selected_profile, "scripts"
+        )
         with TabbedContent():
             with TabPane(title="Modules"):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
-                        modules = self.constructModuleWidgets()
+                        modules = self.construct_widgets("modules")
                         yield SelectionList[int](*modules, id="modulesSelect")
 
                     with Vertical(id="actions-pane"):
@@ -54,9 +62,9 @@ class MainScreen(Screen):
 
             with TabPane(title="Scripts", id="scripts"):
                 with Static(id="grid-container"):
-                    # with Static(classes="modules-pane"):
-                    #     modules = getModules(self.directory, self.ctx.selected_profile)
-                    #     yield SelectionList[int](*modules,id="scriptsSelect")
+                    with Static(classes="modules-pane"):
+                        modules = self.construct_widgets("scripts")
+                        yield SelectionList[int](*modules,id="scriptsSelect")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Select all")
@@ -78,14 +86,14 @@ class MainScreen(Screen):
 
     def on_mount(self) -> None:
         self.query_one("#modulesSelect").border_title = "Choose modules to install:"
-        # self.query_one("#scriptsSelect").border_title = "Choose scripts to install:"
+        self.query_one("#scriptsSelect").border_title = "Choose scripts to install:"
         self.query_one(Pretty).border_title = "Selected modules and scripts:"
 
     @on(Mount)
     @on(SelectionList.SelectedChanged)
     def update_selected_view(self) -> None:
-        # self.query_one(Pretty).update(self.query_one(SelectionList).selected)
-        self.query_one(Pretty).update(getModules(self.directory))
+        self.query_one(Pretty).update(self.query_one(SelectionList).selected)
+        self.query_one(Pretty).update([self.modules, self.scripts])
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
@@ -103,16 +111,21 @@ class MainScreen(Screen):
         #     subprocess.run("cls" if name == "nt" else "clear", shell=True)
         #     self.engine.install("powertoys")
 
-    def constructModuleWidgets(self):
+    def construct_widgets(self, widget_type):
         widgets = []
-        for m in self.modules:
+        for m in self.modules if widget_type == "modules" else self.scripts:
             widgets.append(
                 (
                     m["content"]["name"].capitalize(),
                     m["filename"],
                     (
                         True
-                        if m["filename"].removesuffix(".yaml") in self.preSelectedModules
+                        if m["filename"].removesuffix(".yaml")
+                        in (
+                            self.pre_selected_modules
+                            if widget_type == "modules"
+                            else self.pre_selected_scripts
+                        )
                         else False
                     ),
                 )

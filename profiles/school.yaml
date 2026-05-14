@@ -5,9 +5,5 @@ modules:
   - flutter
   - vscode
 
-config:
-  windows:
-    - echo "windows config"
-
-  linux:
-    - echo "linux config"
+scripts:
+  - test
