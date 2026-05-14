@@ -58,7 +58,7 @@ class MainScreen(Screen):
                         yield Button("Select all")
                         yield Button("Deselect all")
                         yield Button("Reset")
-                        yield Button("Next->", id="nexBtnModules")
+                        yield Button("Next->", id="next-btn-modules")
 
             with TabPane(title="Scripts", id="scripts"):
                 with Static(id="grid-container"):
@@ -70,8 +70,8 @@ class MainScreen(Screen):
                         yield Button("Select all")
                         yield Button("Deselect all")
                         yield Button("Reset")
-                        yield Button("Next->", id="nextBtnScripts")
-                        yield Button("<-Back", id="backBtnScripts")
+                        yield Button("Next->", id="next-btn-scripts")
+                        yield Button("<-Back", id="back-btn-scripts")
 
             with TabPane(title="Overview", id="install"):
                 with Static(id="grid-container"):
@@ -79,8 +79,8 @@ class MainScreen(Screen):
                         yield Pretty([], id="overviewPretty")
 
                     with Vertical(id="actions-pane"):
-                        yield Button("Install", id="installBtn")
-                        yield Button("<-Back", id="backBtnInstall")
+                        yield Button("Install", id="install-btn")
+                        yield Button("<-Back", id="back-btn-install")
 
         yield Footer()
 
@@ -92,19 +92,19 @@ class MainScreen(Screen):
     @on(Mount)
     @on(SelectionList.SelectedChanged)
     def update_selected_view(self) -> None:
-        self.query_one(Pretty).update(self.query_one(SelectionList).selected)
+        # self.query_one(Pretty).update(self.query_one(SelectionList).selected)
         self.query_one(Pretty).update([self.modules, self.scripts])
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
-            case "nexBtnModules":
-                self.query_one("#nextBtnScripts").focus()
-            case "nextBtnScripts":
-                self.query_one("#installBtn").focus()
-            case "backBtnScripts":
-                self.query_one("#nexBtnModules").focus()
-            case "backBtnInstall":
-                self.query_one("#nextBtnScripts").focus()
+            case "next-btn-modules":
+                self.query_one("#next-btn-scripts").focus()
+            case "next-btn-scripts":
+                self.query_one("#install-btn").focus()
+            case "back-btn-scripts":
+                self.query_one("#next-btn-modules").focus()
+            case "back-btn-install":
+                self.query_one("#next-btn-scripts").focus()
 
         # if event.button.id == "install":
         #     self.app.exit(str(event.button))
