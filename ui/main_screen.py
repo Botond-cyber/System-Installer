@@ -38,8 +38,8 @@ class MainScreen(Screen):
         with TabbedContent():
             with TabPane(title="Modules"):
                 with Static(id="grid-container"):
-                    with Static(id="modules-pane"):
-                        yield Label(" Choose modules to install:", id="title")
+                    with Static(classes="modules-pane"):
+                        yield Label(" Choose modules to install:", classes="title")
                         modules = getModules(self.directory, self.ctx.selected_profile)
                         yield SelectionList[int](*modules)
 
@@ -47,11 +47,12 @@ class MainScreen(Screen):
                         yield Button("Select all")
                         yield Button("Deselect all")
                         yield Button("Reset")
-                        yield NextTabButton("Next->", id="nextScripts")
+                        yield NextTabButton("Next->", id="nexBtnModules")
+
             with TabPane(title="Scripts", id="scripts"):
                 with Static(id="grid-container"):
-                    with Static(id="modules-pane"):
-                        yield Label(" Choose modules to install:", id="title")
+                    with Static(classes="modules-pane"):
+                        yield Label(" Choose modules to install:", classes="title")
                         modules = getModules(self.directory, self.ctx.selected_profile)
                         yield SelectionList[int](*modules)
 
@@ -59,17 +60,19 @@ class MainScreen(Screen):
                         yield Button("Select all")
                         yield Button("Deselect all")
                         yield Button("Reset")
-                        yield NextTabButton("Next->", id="nextInstall")
+                        yield NextTabButton("Next->", id="nextBtnScripts")
+                        yield NextTabButton("<-Back", id="backBtnScripts")
 
             with TabPane(title="Overview", id="install"):
                 with Static(id="grid-container"):
-                    with Static(id="modules-pane"):
-                        yield Label(" Choose modules to install:", id="title")
+                    with Static(classes="modules-pane"):
+                        yield Label(" Choose modules to install:", classes="title")
                         modules = getModules(self.directory, self.ctx.selected_profile)
                         yield SelectionList[int](*modules)
 
                     with Vertical(id="actions-pane"):
-                        yield Button("Install", id="install")
+                        yield Button("Install", id="installBtn")
+                        yield NextTabButton("<-Back", id="backBtnInstall")
 
         yield Footer()
 
@@ -77,17 +80,23 @@ class MainScreen(Screen):
         print(self.ctx.selected_profile)
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
+
+        match event.button.id:
+
+            case "nexBtnModules":
+                self.query_one("#nextBtnScripts").focus()
+            case "nextBtnScripts":
+                self.query_one("#installBtn").focus()
+            case "backBtnScripts":
+                self.query_one("#nexBtnModules").focus()
+            case "backBtnInstall":
+                self.query_one("#nextBtnScripts").focus()
+
         if event.button.id == "install":
             self.app.exit(str(event.button))
             subprocess.run("cls" if name == "nt" else "clear", shell=True)
             self.engine.install("powertoys")
 
-        if event.button.id == "nextScripts":
-            self.action_show_tab("scripts")
-        
-        if event.button.id == "nextInstall":
-            self.action_show_tab("install")
-    
     def action_show_tab(self, tab: str) -> None:
         """Switch to a new tab."""
         self.get_child_by_type(TabbedContent).active = tab

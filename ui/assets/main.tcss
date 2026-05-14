@@ -4,7 +4,7 @@
     width: 100%;
 }
 
-#modules-pane {
+.modules-pane {
     width: 1fr;
     height: 100%;
 }
@@ -15,7 +15,7 @@
     margin-left: 2;
     align: center middle;
 }
-#title{
+.title{
     margin-bottom: 1;
 }
 SelectionList {
