@@ -52,7 +52,7 @@ class MainScreen(Screen):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
                         modules = self.construct_widgets("modules")
-                        yield SelectionList[int](*modules, id="modulesSelect")
+                        yield SelectionList[int](*modules, id="modules-select")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Select all")
@@ -64,7 +64,7 @@ class MainScreen(Screen):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
                         modules = self.construct_widgets("scripts")
-                        yield SelectionList[int](*modules,id="scriptsSelect")
+                        yield SelectionList[int](*modules,id="scripts-select")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Select all")
@@ -85,8 +85,8 @@ class MainScreen(Screen):
         yield Footer()
 
     def on_mount(self) -> None:
-        self.query_one("#modulesSelect").border_title = "Choose modules to install:"
-        self.query_one("#scriptsSelect").border_title = "Choose scripts to install:"
+        self.query_one("#modules-select").border_title = "Choose modules to install:"
+        self.query_one("#scripts-select").border_title = "Choose scripts to install:"
         self.query_one(Pretty).border_title = "Selected modules and scripts:"
 
     @on(Mount)
@@ -111,7 +111,7 @@ class MainScreen(Screen):
         #     subprocess.run("cls" if name == "nt" else "clear", shell=True)
         #     self.engine.install("powertoys")
 
-    def construct_widgets(self, widget_type):
+    def construct_widgets(self, widget_type) -> tuple:
         widgets = []
         for m in self.modules if widget_type == "modules" else self.scripts:
             widgets.append(
