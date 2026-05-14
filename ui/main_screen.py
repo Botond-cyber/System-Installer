@@ -1,12 +1,8 @@
-import subprocess
-from os import name
-
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import (
     Label,
     SelectionList,
-    Header,
     Footer,
     Button,
     Static,
@@ -17,9 +13,6 @@ from textual.containers import Vertical
 
 from core.loader import getModules
 
-
-class NextTabButton(Button):
-    FOCUS_ON_CLICK = False
 
 
 class MainScreen(Screen):
@@ -47,7 +40,7 @@ class MainScreen(Screen):
                         yield Button("Select all")
                         yield Button("Deselect all")
                         yield Button("Reset")
-                        yield NextTabButton("Next->", id="nexBtnModules")
+                        yield Button("Next->", id="nexBtnModules")
 
             with TabPane(title="Scripts", id="scripts"):
                 with Static(id="grid-container"):
@@ -60,8 +53,8 @@ class MainScreen(Screen):
                         yield Button("Select all")
                         yield Button("Deselect all")
                         yield Button("Reset")
-                        yield NextTabButton("Next->", id="nextBtnScripts")
-                        yield NextTabButton("<-Back", id="backBtnScripts")
+                        yield Button("Next->", id="nextBtnScripts")
+                        yield Button("<-Back", id="backBtnScripts")
 
             with TabPane(title="Overview", id="install"):
                 with Static(id="grid-container"):
@@ -72,17 +65,12 @@ class MainScreen(Screen):
 
                     with Vertical(id="actions-pane"):
                         yield Button("Install", id="installBtn")
-                        yield NextTabButton("<-Back", id="backBtnInstall")
+                        yield Button("<-Back", id="backBtnInstall")
 
         yield Footer()
 
-    def on_mount(self) -> None:
-        print(self.ctx.selected_profile)
-
     def on_button_pressed(self, event: Button.Pressed) -> None:
-
         match event.button.id:
-
             case "nexBtnModules":
                 self.query_one("#nextBtnScripts").focus()
             case "nextBtnScripts":
@@ -92,11 +80,7 @@ class MainScreen(Screen):
             case "backBtnInstall":
                 self.query_one("#nextBtnScripts").focus()
 
-        if event.button.id == "install":
-            self.app.exit(str(event.button))
-            subprocess.run("cls" if name == "nt" else "clear", shell=True)
-            self.engine.install("powertoys")
-
-    def action_show_tab(self, tab: str) -> None:
-        """Switch to a new tab."""
-        self.get_child_by_type(TabbedContent).active = tab
+        # if event.button.id == "install":
+        #     self.app.exit(str(event.button))
+        #     subprocess.run("cls" if name == "nt" else "clear", shell=True)
+        #     self.engine.install("powertoys")
