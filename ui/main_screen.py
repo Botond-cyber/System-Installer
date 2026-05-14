@@ -8,11 +8,11 @@ from textual.widgets import (
     Static,
     TabbedContent,
     TabPane,
+    Pretty,
 )
 from textual.containers import Vertical
 
 from core.loader import getModules
-
 
 
 class MainScreen(Screen):
@@ -32,9 +32,8 @@ class MainScreen(Screen):
             with TabPane(title="Modules"):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
-                        yield Label(" Choose modules to install:", classes="title")
                         modules = getModules(self.directory, self.ctx.selected_profile)
-                        yield SelectionList[int](*modules)
+                        yield SelectionList[int](*modules,id="modulesSelect")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Select all")
@@ -45,9 +44,8 @@ class MainScreen(Screen):
             with TabPane(title="Scripts", id="scripts"):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
-                        yield Label(" Choose modules to install:", classes="title")
                         modules = getModules(self.directory, self.ctx.selected_profile)
-                        yield SelectionList[int](*modules)
+                        yield SelectionList[int](*modules,id="scriptsSelect")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Select all")
@@ -59,15 +57,19 @@ class MainScreen(Screen):
             with TabPane(title="Overview", id="install"):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
-                        yield Label(" Choose modules to install:", classes="title")
-                        modules = getModules(self.directory, self.ctx.selected_profile)
-                        yield SelectionList[int](*modules)
+                        yield Pretty([], id="overviewPretty")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Install", id="installBtn")
                         yield Button("<-Back", id="backBtnInstall")
 
         yield Footer()
+
+    def on_mount(self) -> None:
+        self.query_one("#modulesSelect").border_title = "Choose modules to install:"
+        self.query_one("#scriptsSelect").border_title = "Choose scripts to install:"
+        self.query_one(Pretty).border_title = "Selected modules and scripts:"
+
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
