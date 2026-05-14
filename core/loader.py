@@ -2,32 +2,30 @@ import yaml
 from os import listdir, path
 
 
-def load_module(name: str):
+def load_module(name: str) -> dict:
     path = f"modules/{name}.yaml"
 
     with open(path, "r") as f:
         return yaml.safe_load(f)
 
 
-def getModules(directory, profile):
+def getModules(directory) -> tuple:
     modules = []
-    preSelectedModules = getModulesFromProfile(profile)
-    for idx, f in enumerate(listdir(directory)):
+    for f in listdir(directory):
         if path.isfile(path.join(directory, f)):
             modules.append(
-                (
-                    f.removesuffix(".yaml").capitalize(),
-                    idx,
-                    True if f.removesuffix(".yaml") in preSelectedModules else False,
-                )
+                {
+                    "filename": f.removesuffix(".yaml"),
+                    "content": load_module(f.removesuffix(".yaml")),
+                }
             )
     return tuple(modules)
 
 
-def getModulesFromProfile(profile):
+def getModulesFromProfile(profile) -> tuple:
     if profile == "Custom":
-        return []
+        return ()
     else:
         path = f"profiles/{profile.lower()}.yaml"
         with open(path, "r") as f:
-            return yaml.safe_load(f)["modules"]
+            return tuple(yaml.safe_load(f)["modules"])

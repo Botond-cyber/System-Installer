@@ -1,7 +1,5 @@
 name: vscode
 
-
-
 actions:
   install:
     linux:
