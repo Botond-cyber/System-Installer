@@ -28,7 +28,7 @@ class MainScreen(Screen):
         self.scripts = ()
         self.preSelectedModules = ()
         self.dependencies = []
-        self.selected_modules =[]
+        self.selected_modules = []
         self.selected_scripts = []
         super().__init__(name, id, classes)
 
@@ -53,7 +53,7 @@ class MainScreen(Screen):
             with TabPane(title="Modules"):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
-                        modules = self.construct_widgets("modules")
+                        modules = self._construct_widgets("modules")
                         yield SelectionList[int](*modules, id="modules-select")
 
                     with Vertical(id="actions-pane"):
@@ -65,7 +65,7 @@ class MainScreen(Screen):
             with TabPane(title="Scripts", id="scripts"):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
-                        modules = self.construct_widgets("scripts")
+                        modules = self._construct_widgets("scripts")
                         yield SelectionList[int](*modules, id="scripts-select")
 
                     with Vertical(id="actions-pane"):
@@ -114,7 +114,7 @@ class MainScreen(Screen):
 
                 s = str(candidate)
                 # normalize whitespace and non-breaking spaces
-                s = s.replace("\u00A0", " ").strip()
+                s = s.replace("\u00a0", " ").strip()
                 out.append(s)
             return out
 
@@ -124,10 +124,15 @@ class MainScreen(Screen):
                 n = n[: -len(".yaml")]
             return n
 
-        self.selected_modules = [_sanitize_name(s) for s in _values_from_selection(modules_select)]
-        self.selected_scripts = [_sanitize_name(s) for s in _values_from_selection(scripts_select)]
-
-        self.query_one(Markdown).update(self.construct_markdown())
+        self.selected_modules = [
+            _sanitize_name(s) for s in _values_from_selection(modules_select)
+        ]
+        self.selected_scripts = [
+            _sanitize_name(s) for s in _values_from_selection(scripts_select)
+        ]
+        self._get_dependencies("modules")
+        self._get_dependencies("scripts")
+        self.query_one(Markdown).update(self._construct_markdown())
         # self.query_one(Markdown).update([self.modules, self.scripts])
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -146,7 +151,7 @@ class MainScreen(Screen):
         #     subprocess.run("cls" if name == "nt" else "clear", shell=True)
         #     self.engine.install("powertoys")
 
-    def construct_widgets(self, widget_type) -> tuple:
+    def _construct_widgets(self, widget_type) -> tuple:
         widgets = []
         for m in self.modules if widget_type == "modules" else self.scripts:
             widgets.append(
@@ -167,7 +172,7 @@ class MainScreen(Screen):
             )
         return tuple(widgets)
 
-    def construct_markdown(self) -> str:
+    def _construct_markdown(self) -> str:
         modules_md = "\n".join(f"- {m}" for m in self.selected_modules) or "None"
         scripts_md = "\n".join(f"- {s}" for s in self.selected_scripts) or "None"
         deps_md = "\n".join(f"- {d}" for d in self.dependencies) or "None"
@@ -184,3 +189,13 @@ class MainScreen(Screen):
                 deps_md,
             ]
         )
+
+    def _get_dependencies(self, dependency_type):
+        for m in self.modules if dependency_type == "modules" else self.scripts:
+            depends = m.get("content", {}).get("depends")
+            if not depends:
+                continue
+            dependencies = [depends] if isinstance(depends, str) else depends
+            for d in dependencies:
+                if d not in self.dependencies:
+                    self.dependencies.append(d)
