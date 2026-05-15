@@ -1,4 +1,6 @@
 import sys
+import subprocess
+from os import name
 
 from core.engine import Engine
 from core.context import Context
@@ -12,6 +14,11 @@ def main():
     if len(sys.argv) < 2:
         app = InstallerApp(ctx, engine)
         app.run()
+        subprocess.run("cls" if name == "nt" else "clear", shell=True)
+        print(ctx.modules_to_install)
+        print(ctx.scripts_to_run)
+        for m in ctx.modules_to_install:
+            engine.install(m)
 
     modules = sys.argv[1:]
 

@@ -3,7 +3,8 @@ import subprocess
 
 class Context:
     def __init__(self):
-        self.state = {}
+        self.modules_to_install = []
+        self.scripts_to_run = []
         self.installed = set()
         self.selected_profile = None
 

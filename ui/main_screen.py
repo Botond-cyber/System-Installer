@@ -120,6 +120,10 @@ class MainScreen(Screen):
                 self.query_one("#next-btn-modules").focus()
             case "back-btn-install":
                 self.query_one("#next-btn-scripts").focus()
+            case "install-btn":
+                self.ctx.scripts_to_run = list(self.selected_scripts)
+                self.ctx.modules_to_install = list(self.selected_modules)
+                self.app.exit(str(event.button))
 
     def _construct_widgets(self, widget_type) -> tuple:
         widgets = []
