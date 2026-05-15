@@ -167,12 +167,23 @@ class MainScreen(Screen):
             ]
         )
 
+    def _resolve_dependencies(self, depends):
+        if not depends:
+            return []
+        if isinstance(depends, dict):
+            return get_platform_instructions().resolve(depends)
+        if isinstance(depends, str):
+            return [depends]
+        if isinstance(depends, list):
+            return depends
+        return []
+
     def _get_dependencies(self, dependency_type):
         for m in self.modules if dependency_type == "modules" else self.scripts:
             depends = m.get("content", {}).get("depends")
             if not depends:
                 continue
-            dependencies = [depends] if isinstance(depends, str) else depends
+            dependencies = self._resolve_dependencies(depends)
             for d in dependencies:
                 if d not in self.dependencies:
                     self.dependencies.append(d)

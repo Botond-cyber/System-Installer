@@ -1,8 +1,11 @@
 name: Flutter
 
 depends:
-  - git
-  - unzip
+  linux:
+    - git
+    - unzip
+  windows:
+    - git
 
 actions:
   install:

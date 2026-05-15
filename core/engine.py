@@ -7,6 +7,17 @@ class Engine:
         self.ctx = ctx
         self.platform_instructions = get_platform_instructions()
 
+    def _resolve_dependencies(self, depends):
+        if not depends:
+            return []
+        if isinstance(depends, dict):
+            return self.platform_instructions.resolve(depends)
+        if isinstance(depends, str):
+            return [depends]
+        if isinstance(depends, list):
+            return depends
+        return []
+
     def install(self, module_name: str):
         if self.ctx.is_installed(module_name):
             return
@@ -16,7 +27,7 @@ class Engine:
             print(f"❌ Module {module_name} not found")
             return
         print(f"📦 Installing {module_name}...")
-        for dep in module.get("depends", []):
+        for dep in self._resolve_dependencies(module.get("depends")):
             self.install(dep)
             if not self.ctx.is_installed(dep):
                 print(
