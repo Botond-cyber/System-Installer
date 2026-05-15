@@ -1,11 +1,11 @@
 from core.loader import load_module_or_script
-from core.platform import get_platform
+from core.platform import get_platform_instructions
 
 
 class Engine:
     def __init__(self, ctx):
         self.ctx = ctx
-        self.platform = get_platform()
+        self.platform_instructions = get_platform_instructions()
 
     def install(self, module_name: str):
         if self.ctx.is_installed(module_name):
@@ -25,7 +25,7 @@ class Engine:
                 return
         actions = module["actions"]["install"]
         # pick OS-specific steps
-        steps = self.platform.resolve(actions)
+        steps = self.platform_instructions.resolve(actions)
         for step in steps:
             try:
                 self.ctx.run(step)

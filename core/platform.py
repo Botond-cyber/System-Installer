@@ -12,12 +12,22 @@ class WindowsPlatform:
         return actions.get("windows", [])
 
 
-def get_platform():
+def get_platform_instructions():
     system = py_platform.system().lower()
 
     if system == "linux":
         return LinuxPlatform()
     elif system == "windows":
         return WindowsPlatform()
+    else:
+        raise Exception("Unsupported OS")
+
+
+def get_platform():
+    system = py_platform.system().lower()
+    if system == "linux":
+        return distro.id()
+    elif system == "windows":
+        return "windows"
     else:
         raise Exception("Unsupported OS")

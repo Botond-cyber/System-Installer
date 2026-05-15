@@ -14,6 +14,7 @@ from textual.widgets import (
 from textual.containers import Vertical
 
 from core.loader import get_modules_or_scripts, get_modules_or_scrips_from_profile
+from core.platform import get_platform
 
 
 class MainScreen(Screen):
@@ -153,7 +154,25 @@ class MainScreen(Screen):
 
     def _construct_widgets(self, widget_type) -> tuple:
         widgets = []
+        platform_name = get_platform()
         for m in self.modules if widget_type == "modules" else self.scripts:
+            actions = m.get("content", {}).get("actions", {})
+            actions = actions.get("install", actions)
+
+            if platform_name == "windows":
+                steps = actions.get("windows")
+            else:
+                linux_actions = actions.get("linux")
+                if isinstance(linux_actions, dict):
+                    steps = linux_actions.get(platform_name)
+                elif isinstance(linux_actions, list):
+                    steps = linux_actions
+                else:
+                    steps = None
+
+            if not steps:
+                continue
+
             widgets.append(
                 (
                     m["content"]["name"].capitalize(),
