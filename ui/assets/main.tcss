@@ -21,7 +21,7 @@ SelectionList {
     border: round $primary;
 }
 
-Pretty {
+Markdown {
     border: round $primary;
 }
 

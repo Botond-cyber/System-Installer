@@ -9,7 +9,7 @@ from textual.widgets import (
     Static,
     TabbedContent,
     TabPane,
-    Pretty,
+    Markdown,
 )
 from textual.containers import Vertical
 
@@ -28,6 +28,8 @@ class MainScreen(Screen):
         self.scripts = ()
         self.preSelectedModules = ()
         self.dependencies = []
+        self.selected_modules =[]
+        self.selected_scripts = []
         super().__init__(name, id, classes)
 
     @property
@@ -64,7 +66,7 @@ class MainScreen(Screen):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
                         modules = self.construct_widgets("scripts")
-                        yield SelectionList[int](*modules,id="scripts-select")
+                        yield SelectionList[int](*modules, id="scripts-select")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Select all")
@@ -76,7 +78,7 @@ class MainScreen(Screen):
             with TabPane(title="Overview", id="install"):
                 with Static(id="grid-container"):
                     with Static(classes="modules-pane"):
-                        yield Pretty([], id="overviewPretty")
+                        yield Markdown(id="overviewMarkdown")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Install", id="install-btn")
@@ -87,13 +89,46 @@ class MainScreen(Screen):
     def on_mount(self) -> None:
         self.query_one("#modules-select").border_title = "Choose modules to install:"
         self.query_one("#scripts-select").border_title = "Choose scripts to install:"
-        self.query_one(Pretty).border_title = "Selected modules and scripts:"
+        self.query_one(Markdown).border_title = "Selected modules and scripts:"
 
     @on(Mount)
     @on(SelectionList.SelectedChanged)
-    def update_selected_view(self) -> None:
-        # self.query_one(Pretty).update(self.query_one(SelectionList).selected)
-        self.query_one(Pretty).update([self.modules, self.scripts])
+    def update_selected_view(self, event) -> None:
+        modules_select = self.query_one("#modules-select", SelectionList)
+        scripts_select = self.query_one("#scripts-select", SelectionList)
+
+        def _values_from_selection(sel: SelectionList) -> list:
+            vals = getattr(sel, "selected", None)
+            if not vals:
+                return []
+            out = []
+            for v in vals:
+                # Prefer an explicit value attribute when available
+                candidate = None
+                if hasattr(v, "value"):
+                    candidate = v.value
+                elif isinstance(v, (tuple, list)) and len(v) > 1:
+                    candidate = v[1]
+                else:
+                    candidate = v
+
+                s = str(candidate)
+                # normalize whitespace and non-breaking spaces
+                s = s.replace("\u00A0", " ").strip()
+                out.append(s)
+            return out
+
+        def _sanitize_name(name: str) -> str:
+            n = name.strip()
+            if n.endswith(".yaml"):
+                n = n[: -len(".yaml")]
+            return n
+
+        self.selected_modules = [_sanitize_name(s) for s in _values_from_selection(modules_select)]
+        self.selected_scripts = [_sanitize_name(s) for s in _values_from_selection(scripts_select)]
+
+        self.query_one(Markdown).update(self.construct_markdown())
+        # self.query_one(Markdown).update([self.modules, self.scripts])
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
@@ -131,3 +166,21 @@ class MainScreen(Screen):
                 )
             )
         return tuple(widgets)
+
+    def construct_markdown(self) -> str:
+        modules_md = "\n".join(f"- {m}" for m in self.selected_modules) or "None"
+        scripts_md = "\n".join(f"- {s}" for s in self.selected_scripts) or "None"
+        deps_md = "\n".join(f"- {d}" for d in self.dependencies) or "None"
+
+        return "\n".join(
+            [
+                "## Modules:",
+                modules_md,
+                "",
+                "## Scripts:",
+                scripts_md,
+                "",
+                "## Dependencies:",
+                deps_md,
+            ]
+        )
