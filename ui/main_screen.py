@@ -14,7 +14,7 @@ from textual.widgets import (
 from textual.containers import Vertical
 
 from core.loader import get_modules_or_scripts, get_modules_or_scrips_from_profile
-from core.platform import get_platform
+from core.platform import get_platform_instructions
 
 
 class MainScreen(Screen):
@@ -98,43 +98,17 @@ class MainScreen(Screen):
         modules_select = self.query_one("#modules-select", SelectionList)
         scripts_select = self.query_one("#scripts-select", SelectionList)
 
-        def _values_from_selection(sel: SelectionList) -> list:
-            vals = getattr(sel, "selected", None)
-            if not vals:
-                return []
-            out = []
-            for v in vals:
-                # Prefer an explicit value attribute when available
-                candidate = None
-                if hasattr(v, "value"):
-                    candidate = v.value
-                elif isinstance(v, (tuple, list)) and len(v) > 1:
-                    candidate = v[1]
-                else:
-                    candidate = v
+        def _selected_names(sel: SelectionList) -> list[str]:
+            return [
+                str(v).replace("\u00a0", " ").strip().removesuffix(".yaml")
+                for v in (sel.selected or [])
+            ]
 
-                s = str(candidate)
-                # normalize whitespace and non-breaking spaces
-                s = s.replace("\u00a0", " ").strip()
-                out.append(s)
-            return out
-
-        def _sanitize_name(name: str) -> str:
-            n = name.strip()
-            if n.endswith(".yaml"):
-                n = n[: -len(".yaml")]
-            return n
-
-        self.selected_modules = [
-            _sanitize_name(s) for s in _values_from_selection(modules_select)
-        ]
-        self.selected_scripts = [
-            _sanitize_name(s) for s in _values_from_selection(scripts_select)
-        ]
+        self.selected_modules = _selected_names(modules_select)
+        self.selected_scripts = _selected_names(scripts_select)
         self._get_dependencies("modules")
         self._get_dependencies("scripts")
         self.query_one(Markdown).update(self._construct_markdown())
-        # self.query_one(Markdown).update([self.modules, self.scripts])
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
@@ -147,29 +121,13 @@ class MainScreen(Screen):
             case "back-btn-install":
                 self.query_one("#next-btn-scripts").focus()
 
-        # if event.button.id == "install":
-        #     self.app.exit(str(event.button))
-        #     subprocess.run("cls" if name == "nt" else "clear", shell=True)
-        #     self.engine.install("powertoys")
-
     def _construct_widgets(self, widget_type) -> tuple:
         widgets = []
-        platform_name = get_platform()
+        platform_instructions = get_platform_instructions()
         for m in self.modules if widget_type == "modules" else self.scripts:
             actions = m.get("content", {}).get("actions", {})
             actions = actions.get("install", actions)
-
-            if platform_name == "windows":
-                steps = actions.get("windows")
-            else:
-                linux_actions = actions.get("linux")
-                if isinstance(linux_actions, dict):
-                    steps = linux_actions.get(platform_name)
-                elif isinstance(linux_actions, list):
-                    steps = linux_actions
-                else:
-                    steps = None
-
+            steps = platform_instructions.resolve(actions)
             if not steps:
                 continue
 
