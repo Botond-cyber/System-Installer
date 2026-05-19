@@ -17,8 +17,9 @@ def main():
         subprocess.run("cls" if name == "nt" else "clear", shell=True)
         print(ctx.modules_to_install)
         print(ctx.scripts_to_run)
-        for m in ctx.modules_to_install:
-            engine.install(m)
+        if ctx.modules_to_install:
+            for m in ctx.modules_to_install:
+                engine.install(m)
 
     modules = sys.argv[1:]
 

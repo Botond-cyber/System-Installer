@@ -106,6 +106,7 @@ class MainScreen(Screen):
 
         self.selected_modules = _selected_names(modules_select)
         self.selected_scripts = _selected_names(scripts_select)
+        self.dependencies = []
         self._get_dependencies("modules")
         self._get_dependencies("scripts")
         self.query_one(Markdown).update(self._construct_markdown())
@@ -183,7 +184,15 @@ class MainScreen(Screen):
         return []
 
     def _get_dependencies(self, dependency_type):
-        for m in self.modules if dependency_type == "modules" else self.scripts:
+        src = self.modules if dependency_type == "modules" else self.scripts
+        selected = (
+            self.selected_modules if dependency_type == "modules" else self.selected_scripts
+        )
+        for m in src:
+            filename = m.get("filename", "")
+            name = filename.removesuffix(".yaml") if filename else filename
+            if name not in selected:
+                continue
             depends = m.get("content", {}).get("depends")
             if not depends:
                 continue
