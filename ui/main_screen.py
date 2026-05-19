@@ -172,15 +172,19 @@ class MainScreen(Screen):
             ]
         )
 
-    def _resolve_dependencies(self, depends):
+    def _resolve_dependencies(self, depends, dep_type="modules"):
+        """Resolve dependencies for a given type (modules or scripts).
+        Returns a list of dependency names."""
         if not depends:
             return []
         if isinstance(depends, dict):
-            return get_platform_instructions().resolve(depends)
-        if isinstance(depends, str):
-            return [depends]
-        if isinstance(depends, list):
-            return depends
+            # Extract the specific dependency type (modules or scripts)
+            dep_list = depends.get(dep_type, {})
+            if isinstance(dep_list, dict):
+                # It's platform-specific, resolve it
+                return get_platform_instructions().resolve(dep_list)
+            elif isinstance(dep_list, list):
+                return dep_list
         return []
 
     def _get_dependencies(self, dependency_type):
@@ -196,7 +200,13 @@ class MainScreen(Screen):
             depends = m.get("content", {}).get("depends")
             if not depends:
                 continue
-            dependencies = self._resolve_dependencies(depends)
-            for d in dependencies:
+            # Get module dependencies
+            module_dependencies = self._resolve_dependencies(depends, "modules")
+            for d in module_dependencies:
+                if d not in self.dependencies:
+                    self.dependencies.append(d)
+            # Get script dependencies
+            script_dependencies = self._resolve_dependencies(depends, "scripts")
+            for d in script_dependencies:
                 if d not in self.dependencies:
                     self.dependencies.append(d)

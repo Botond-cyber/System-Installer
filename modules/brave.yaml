@@ -1,5 +1,10 @@
 name: Brave Browser
 
+depends:
+  scripts:
+    linux:
+      - update
+
 actions:
   install:
     linux:
