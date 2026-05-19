@@ -1,0 +1,10 @@
+name: Python 3.14
+
+actions:
+  install:
+    linux:
+      fedora:
+        - sudo dnf install python3
+        - sudo dnf install python3-pip
+    windows:
+      - winget install -e --id Python.Python.3.14 --scope user

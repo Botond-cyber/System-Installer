@@ -1,0 +1,9 @@
+name: Mozilla Firefox
+
+actions:
+  install:
+    linux:
+      fedora:
+        - sudo dnf install -y firefox
+    windows:
+      - winget install -e --id Mozilla.Firefox --scope user

@@ -15,12 +15,14 @@ def main():
         app = InstallerApp(ctx, engine)
         app.run()
         subprocess.run("cls" if name == "nt" else "clear", shell=True)
-        print(ctx.modules_to_install)
-        print(ctx.scripts_to_run)
         if ctx.modules_to_install:
+            print(ctx.modules_to_install)
             for m in ctx.modules_to_install:
                 engine.install(m)
-
+        if ctx.scripts_to_run:
+            print(ctx.scripts_to_run)
+            for s in ctx.scripts_to_run:
+                engine.run(s)
     modules = sys.argv[1:]
 
     for m in modules:

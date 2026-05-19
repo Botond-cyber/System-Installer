@@ -3,6 +3,6 @@ name: Test
 actions:
   linux:
     fedora:
-      - echo "Flutter install step placeholder"
+      - echo "test"
   windows:
-    - winget install Google.Flutter
+    - echo "test"

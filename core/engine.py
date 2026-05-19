@@ -35,7 +35,6 @@ class Engine:
                 )
                 return
         actions = module["actions"]["install"]
-        # pick OS-specific steps
         steps = self.platform_instructions.resolve(actions)
         for step in steps:
             try:
@@ -47,7 +46,7 @@ class Engine:
     
     def run(self, script_name: str):
         try:
-            script = load_module_or_script(script_name)
+            script = load_module_or_script(script_name, "scripts/")
         except:
             print(f"❌ script {script_name} not found")
             return

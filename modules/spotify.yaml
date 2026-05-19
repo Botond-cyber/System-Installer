@@ -1,0 +1,12 @@
+name: Spotify
+
+actions:
+  install:
+    linux:
+      fedora:
+        - sudo dnf install -y flatpak
+        - flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+        - flatpak install flathub com.spotify.Client
+        - flatpak run com.spotify.Client
+    windows:
+      - winget install -e --id Spotify.Spotify --scope user

@@ -1,0 +1,9 @@
+name: Nano text editor
+
+actions:
+  install:
+    linux:
+      fedora:
+        - sudo dnf install -y nano
+    windows:
+      - winget install -e --id GNU.Nano --scope user

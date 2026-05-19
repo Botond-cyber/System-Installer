@@ -1,0 +1,9 @@
+name: Brave Browser
+
+actions:
+  install:
+    linux:
+      fedora:
+        - curl -fsS https://dl.brave.com/install.sh | sh
+    windows:
+      - winget install -e --id Brave.Brave --scope user
