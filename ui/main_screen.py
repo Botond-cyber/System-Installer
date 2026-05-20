@@ -15,10 +15,11 @@ from textual.containers import Vertical
 
 from core.loader import get_modules_or_scripts, get_modules_or_scrips_from_profile
 from core.platform import get_platform_instructions
+from core.resources import resource_path
 
 
 class MainScreen(Screen):
-    CSS_PATH = "assets/main.tcss"
+    CSS_PATH = resource_path("ui/assets/main.tcss")
     modules_directory = "modules/"
     scripts_directory = "scripts/"
 

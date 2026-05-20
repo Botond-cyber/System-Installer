@@ -4,11 +4,12 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Label, RadioButton, RadioSet
 
+from core.resources import resource_path
 from ui.assets.title import title
 
 
 class IntroScreen(Screen):
-    CSS_PATH = "assets/intro.tcss"
+    CSS_PATH = resource_path("ui/assets/intro.tcss")
     directory = "profiles/"
 
     @property
@@ -28,7 +29,6 @@ class IntroScreen(Screen):
         await self.app.switch_screen("main_screen")
 
     def getProfiles(self, directory):
-        profiles = [
-            f for f in listdir(directory) if path.isfile(path.join(directory, f))
-        ]
+        dir_path = resource_path(directory)
+        profiles = [f for f in listdir(dir_path) if path.isfile(path.join(dir_path, f))]
         return profiles
