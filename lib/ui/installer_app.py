@@ -4,6 +4,8 @@ from typing import List
 from textual.app import App
 from textual.driver import Driver
 
+from lib.core.context import Context
+from lib.core.engine import Engine
 from lib.ui.intro_page import IntroScreen
 from lib.ui.main_screen import MainScreen
 
@@ -11,8 +13,8 @@ from lib.ui.main_screen import MainScreen
 class InstallerApp(App[None]):
     def __init__(
         self,
-        ctx,
-        engine,
+        ctx: Context,
+        engine: Engine,
         driver_class: type[Driver] | None = None,
         css_path: str | PurePath | List[str | PurePath] | None = None,
         watch_css: bool = False,

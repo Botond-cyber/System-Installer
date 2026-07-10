@@ -6,7 +6,8 @@ class Context:
     def __init__(self) -> None:
         self.packages_to_install: list[Package] = []
         self.packages_from_profile: list[Package] = []
-        self.packages: list[Package] = []
+        self.available_packages: list[Package] = []
+        self.available_profiles: list[Profile] = []
 
         self.installed_packages: set[str] = set()
 
