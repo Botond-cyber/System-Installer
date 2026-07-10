@@ -15,9 +15,9 @@ def main():
         app = InstallerApp(ctx, engine)
         app.run()
         subprocess.run("cls" if name == "nt" else "clear", shell=True)
-        if ctx.modules_to_install:
-            print(ctx.modules_to_install)
-            for m in ctx.modules_to_install:
+        if ctx.packages_to_install:
+            print(ctx.packages_to_install)
+            for m in ctx.packages_to_install:
                 engine.install(m)
         if ctx.scripts_to_run:
             print(ctx.scripts_to_run)

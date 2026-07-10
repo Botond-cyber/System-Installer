@@ -1,25 +1,19 @@
-import subprocess
+from lib.models.package import Package
+from lib.models.profile import Profile
 
 
 class Context:
-    def __init__(self):
-        self.modules_to_install = []
-        self.scripts_to_run = []
-        self.installed = set()
-        self.ran_scripts = set()
-        self.selected_profile = None
+    def __init__(self) -> None:
+        self.packages_to_install: list[Package] = []
+        self.packages_from_profile: list[Package] = []
+        self.packages: list[Package] = []
 
-    def run(self, command: str):
-        subprocess.run(command, shell=True, check=True)
+        self.installed_packages: set[str] = set()
 
-    def mark_installed(self, name):
-        self.installed.add(name)
+        self.selected_profile: Profile | None = None
 
-    def is_installed(self, name):
-        return name in self.installed
+    def mark_installed(self, package_id: str) -> None:
+        self.installed_packages.add(package_id)
 
-    def mark_ran_script(self, name):
-        self.ran_scripts.add(name)
-
-    def is_script_ran(self, name):
-        return name in self.ran_scripts
+    def is_installed(self, package_id: str) -> bool:
+        return package_id in self.installed_packages
