@@ -10,7 +10,6 @@ class Context:
         self.selected_profile = None
 
     def run(self, command: str):
-        # print(f"▶ {command}")
         subprocess.run(command, shell=True, check=True)
 
     def mark_installed(self, name):

@@ -2,9 +2,9 @@ import sys
 import subprocess
 from os import name
 
-from core.engine import Engine
-from core.context import Context
-from ui.installer_app import InstallerApp
+from lib.core.engine import Engine
+from lib.core.context import Context
+from lib.ui.installer_app import InstallerApp
 
 
 def main():

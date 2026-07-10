@@ -1,6 +1,0 @@
-name: Windows Terminal
-
-actions:
-  install:
-    windows:
-        - winget install -e --id Microsoft.WindowsTerminal --scope user

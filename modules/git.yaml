@@ -1,9 +1,0 @@
-name: git
-
-actions:
-  install:
-    linux:
-      fedora:
-        - sudo dnf install -y git
-    windows:
-      - winget install --id Git.Git -e --source winget --scope user

@@ -1,5 +1,5 @@
-from core.loader import load_module_or_script
-from core.platform import get_platform_instructions
+from lib.core.loader import Loader
+from lib.core.platform import get_platform_instructions
 
 
 class Engine:
@@ -26,7 +26,7 @@ class Engine:
         if self.ctx.is_installed(module_name):
             return
         try:
-            module = load_module_or_script(module_name)
+            module = Loader.load_module_or_script(module_name)
         except:
             print(f"❌ Module {module_name} not found")
             return
@@ -61,7 +61,7 @@ class Engine:
         if self.ctx.is_script_ran(script_name):
             return
         try:
-            script = load_module_or_script(script_name, "scripts/")
+            script = Loader.load_module_or_script(script_name, "scripts/")
         except:
             print(f"❌ script {script_name} not found")
             return

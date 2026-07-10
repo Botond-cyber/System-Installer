@@ -4,11 +4,11 @@ from typing import List
 from textual.app import App
 from textual.driver import Driver
 
-from ui.intro_page import IntroScreen
-from ui.main_screen import MainScreen
+from lib.ui.intro_page import IntroScreen
+from lib.ui.main_screen import MainScreen
 
 
-class InstallerApp(App):
+class InstallerApp(App[None]):
     def __init__(
         self,
         ctx,

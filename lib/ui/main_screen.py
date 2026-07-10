@@ -13,9 +13,9 @@ from textual.widgets import (
 )
 from textual.containers import Vertical
 
-from core.loader import get_modules_or_scripts, get_modules_or_scrips_from_profile
-from core.platform import get_platform_instructions
-from core.resources import resource_path
+from lib.core.loader import Loader
+from lib.core.platform import get_platform_instructions
+from lib.core.resources import resource_path
 
 
 class MainScreen(Screen):
@@ -43,12 +43,12 @@ class MainScreen(Screen):
         return getattr(self.app, "engine")
 
     def compose(self) -> ComposeResult:
-        self.modules = get_modules_or_scripts(self.modules_directory)
-        self.scripts = get_modules_or_scripts(self.scripts_directory)
-        self.pre_selected_modules = get_modules_or_scrips_from_profile(
+        self.modules = Loader.get_modules_or_scripts(self.modules_directory)
+        self.scripts = Loader.get_modules_or_scripts(self.scripts_directory)
+        self.pre_selected_modules = Loader.get_modules_or_scrips_from_profile(
             self.ctx.selected_profile, "modules/"
         )
-        self.pre_selected_scripts = get_modules_or_scrips_from_profile(
+        self.pre_selected_scripts = Loader.get_modules_or_scrips_from_profile(
             self.ctx.selected_profile, "scripts"
         )
         with TabbedContent():
