@@ -1,9 +1,0 @@
-name: Update
-
-actions:
-  linux:
-    fedora:
-      - sudo dnf update -y
-    ubuntu:
-      - sudo apt update
-      - sudo apt upgrade -y

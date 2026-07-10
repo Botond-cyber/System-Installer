@@ -24,7 +24,7 @@ class IntroScreen(Screen):
     def compose(self) -> ComposeResult:
         yield Label(title)
         yield Label("Choose profile to install:")
-        profiles = Loader.getProfiles(self.directory)
+        profiles = Loader.loadProfiles(self.directory)
         with RadioSet():
             for p in profiles:
                 yield RadioButton(p.removesuffix(".yaml").capitalize())
