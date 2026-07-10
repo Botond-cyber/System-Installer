@@ -1,9 +1,21 @@
-name: school
+profile_schema_version: 1
 
-modules:
-  - git
-  - flutter
-  - vscode
+name: School Setup
+id: school
+version: 1
+description: School dev setup
 
-scripts:
-  - test
+tags:
+  - development
+  - school
+
+supported_os:
+  - windows
+
+packages:
+  all:
+    - git
+    - vscode
+
+  windows:
+    - windows-tools

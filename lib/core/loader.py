@@ -5,7 +5,7 @@ import yaml
 from os import listdir, path
 
 from lib.core.resources import resource_path
-from lib.models.module import Module
+from lib.models.package import Module
 
 
 class Loader:

@@ -1,0 +1,29 @@
+profile_schema_version: 1
+
+name: Example Profile
+id: example_profile
+version: 1
+author: John Doe
+description: An example profile
+tags:
+  - example_tag1
+  - example_tag2
+
+supported_os:
+  - fedora
+  - ubuntu
+  - windows
+
+packages:
+  all:
+    - example_package0
+
+  fedora:
+    - example_package1
+    - example_package2
+  ubuntu:
+    - example_package6
+    - example_package4
+
+  windows:
+    - example_package5

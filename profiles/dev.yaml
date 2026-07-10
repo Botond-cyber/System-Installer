@@ -1,9 +1,24 @@
-name: Dev
-id: dev
-description: Dev environment setup profile
-modules:
-  - git
-  - flutter
+profile_schema_version: 1
 
-scripts:
-  - test
+name: Development Environment
+id: dev
+version: 1
+description: My development workstation setup
+
+tags:
+  - development
+
+supported_os:
+  - fedora
+  - windows
+
+packages:
+  all:
+    - git
+    - vscode
+
+  fedora:
+    - fedora-tools
+
+  windows:
+    - windows-tools

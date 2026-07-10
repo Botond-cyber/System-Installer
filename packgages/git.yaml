@@ -1,0 +1,25 @@
+package_schema_version: 1
+
+name: Git
+id: git
+version: 1
+description: Git version control
+type: utility
+tags:
+  - development
+
+supported_os:
+  - fedora
+  - windows
+
+check:
+  fedora:
+    - git -v
+  windows:
+    - git -v
+
+install:
+  fedora:
+    - sudo dnf install git
+  windows:
+    - winget install --id Git.Git --silent --accept-package-agreements --no-upgrade --scope user
