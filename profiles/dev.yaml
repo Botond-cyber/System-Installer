@@ -1,5 +1,6 @@
-name: dev
-
+name: Dev
+id: dev
+description: Dev environment setup profile
 modules:
   - git
   - flutter

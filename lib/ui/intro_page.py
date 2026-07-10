@@ -10,7 +10,7 @@ from lib.ui.assets.title import title
 
 class IntroScreen(Screen):
     CSS_PATH = resource_path("ui/assets/intro.tcss")
-    directory = "profiles/"
+    directory = "../profiles/"
 
     @property
     def ctx(self):
