@@ -1,4 +1,3 @@
-import sys
 import subprocess
 from os import name
 
@@ -16,24 +15,13 @@ def main():
     ctx = Context()
     engine = Engine(ctx)
 
-    if len(sys.argv) < 2:
-        ctx.available_packages = Loader.load_packages(PACKAGE_DIRECTORY)
-        ctx.available_profiles = Loader.loadProfiles(PROFILE_DIRECTORY)
-        app = InstallerApp(ctx, engine)
-        app.run()
-        subprocess.run("cls" if name == "nt" else "clear", shell=True)
-        # if ctx.packages_to_install:
-        #     print(ctx.packages_to_install)
-        #     for m in ctx.packages_to_install:
-        #         engine.install(m)
-        # if ctx.scripts_to_run:
-        #     print(ctx.scripts_to_run)
-        #     for s in ctx.scripts_to_run:
-        #         engine.run(s)
-    # modules = sys.argv[1:]
-
-    # for m in modules:
-    #     engine.install(m)
+    ctx.available_packages = {
+        package.id: package for package in Loader.load_packages(PACKAGE_DIRECTORY)
+    }
+    ctx.available_profiles = Loader.loadProfiles(PROFILE_DIRECTORY)
+    app = InstallerApp(ctx, engine)
+    app.run()
+    subprocess.run("cls" if name == "nt" else "clear", shell=True)
 
 
 if __name__ == "__main__":

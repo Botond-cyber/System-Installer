@@ -23,8 +23,6 @@ from lib.models.package import Package
 
 class MainScreen(Screen[Any]):
     CSS_PATH = resource_path("ui/assets/main.tcss")
-    modules_directory = "modules/"
-    scripts_directory = "scripts/"
 
     def __init__(
         self, name: str | None = None, id: str | None = None, classes: str | None = None
@@ -92,8 +90,6 @@ class MainScreen(Screen[Any]):
                 self.query_one("#install-btn").focus()
             case "next-btn-scripts":
                 self.query_one("#install-btn").focus()
-            case "back-btn-scripts":
-                self.query_one("#next-btn-packages").focus()
             case "back-btn-install":
                 self.query_one("#next-btn-packages").focus()
             case "install-btn":
@@ -109,7 +105,7 @@ class MainScreen(Screen[Any]):
         selected_packages: list[Package] = (
             selected_profile.packages[self.ctx.os] if selected_profile else []
         )
-        for idx, p in enumerate(self.ctx.available_packages):
+        for idx, p in enumerate(self.ctx.available_packages.values()):
             if self.ctx.os not in p.supported_os:
                 continue
             else:

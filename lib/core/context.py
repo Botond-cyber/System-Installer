@@ -5,9 +5,9 @@ from lib.models.profile import Profile
 
 class Context:
     def __init__(self) -> None:
-        self.packages_to_install: list[Package] = []
+        self.packages_to_install: list[str] = []
         self.packages_from_profile: list[Package] = []
-        self.available_packages: list[Package] = []
+        self.available_packages: dict[str, Package] = {}
         self.available_profiles: list[Profile] = []
         self.os:str = Platform.get_os()
 
