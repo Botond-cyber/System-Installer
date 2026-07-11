@@ -31,5 +31,5 @@ class IntroScreen(Screen[None]):
         yield Label("Choose profile to install:")
         with RadioSet():
             for p in self.ctx.available_profiles:
-                yield RadioButton(p.name)
+                yield RadioButton(p.name, id=p.id)
             yield RadioButton("Custom")

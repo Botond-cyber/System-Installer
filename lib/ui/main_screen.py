@@ -1,3 +1,5 @@
+from typing import Any
+
 from textual import on
 from textual.events import Mount
 from textual.app import ComposeResult
@@ -13,12 +15,13 @@ from textual.widgets import (
 )
 from textual.containers import Vertical
 
-from lib.core.loader import Loader
-from lib.core.platform import get_platform_instructions
+from lib.core.context import Context
+from lib.core.engine import Engine
 from lib.core.resources import resource_path
+from lib.models.package import Package
 
 
-class MainScreen(Screen):
+class MainScreen(Screen[Any]):
     CSS_PATH = resource_path("ui/assets/main.tcss")
     modules_directory = "modules/"
     scripts_directory = "scripts/"
@@ -26,60 +29,38 @@ class MainScreen(Screen):
     def __init__(
         self, name: str | None = None, id: str | None = None, classes: str | None = None
     ) -> None:
-        self.modules = ()
-        self.scripts = ()
-        self.preSelectedModules = ()
-        self.dependencies = []
-        self.selected_modules = []
-        self.selected_scripts = []
+        self.selected_packages = []
         super().__init__(name, id, classes)
 
     @property
-    def ctx(self):
-        return getattr(self.app, "ctx")
+    def app(self) -> Any:
+        return super().app  # type: ignore
 
     @property
-    def engine(self):
-        return getattr(self.app, "engine")
+    def ctx(self) -> Context:
+        return self.app.ctx  # type: ignore[attr-defined]
+
+    @property
+    def engine(self) -> Engine:
+        return self.app.engine  # type: ignore[attr-defined]
 
     def compose(self) -> ComposeResult:
-        self.modules = Loader.get_modules_or_scripts(self.modules_directory)
-        self.scripts = Loader.get_modules_or_scripts(self.scripts_directory)
-        self.pre_selected_modules = Loader.get_modules_or_scrips_from_profile(
-            self.ctx.selected_profile, "modules/"
-        )
-        self.pre_selected_scripts = Loader.get_modules_or_scrips_from_profile(
-            self.ctx.selected_profile, "scripts"
-        )
         with TabbedContent():
-            with TabPane(title="Modules"):
+            with TabPane(title="Packages"):
                 with Static(id="grid-container"):
-                    with Static(classes="modules-pane"):
-                        modules = self._construct_widgets("modules")
-                        yield SelectionList[int](*modules, id="modules-select")
+                    with Static(classes="package-pane"):
+                        packages = self._construct_widgets()
+                        yield SelectionList[int](*packages, id="package-select")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Select all")
                         yield Button("Deselect all")
                         yield Button("Reset")
-                        yield Button("Next->", id="next-btn-modules")
-
-            with TabPane(title="Scripts", id="scripts"):
-                with Static(id="grid-container"):
-                    with Static(classes="modules-pane"):
-                        modules = self._construct_widgets("scripts")
-                        yield SelectionList[int](*modules, id="scripts-select")
-
-                    with Vertical(id="actions-pane"):
-                        yield Button("Select all")
-                        yield Button("Deselect all")
-                        yield Button("Reset")
-                        yield Button("Next->", id="next-btn-scripts")
-                        yield Button("<-Back", id="back-btn-scripts")
+                        yield Button("Next->", id="next-btn-packages")
 
             with TabPane(title="Overview", id="install"):
                 with Static(id="grid-container"):
-                    with Static(classes="modules-pane"):
+                    with Static(classes="package-pane"):
                         yield Markdown(id="overviewMarkdown")
 
                     with Vertical(id="actions-pane"):
@@ -89,125 +70,67 @@ class MainScreen(Screen):
         yield Footer()
 
     def on_mount(self) -> None:
-        self.query_one("#modules-select").border_title = "Choose modules to install:"
-        self.query_one("#scripts-select").border_title = "Choose scripts to install:"
+        self.query_one("#package-select").border_title = "Choose modules to install:"
         self.query_one(Markdown).border_title = "Selected modules and scripts:"
 
     @on(Mount)
     @on(SelectionList.SelectedChanged)
-    def update_selected_view(self, event) -> None:
-        modules_select = self.query_one("#modules-select", SelectionList)
-        scripts_select = self.query_one("#scripts-select", SelectionList)
+    def update_selected_view(
+        self, event: Mount | SelectionList.SelectedChanged[Any]
+    ) -> None:
+        package_select = self.query_one("#package-select", SelectionList)  # type: ignore
 
-        def _selected_names(sel: SelectionList) -> list[str]:
-            return [
-                str(v).replace("\u00a0", " ").strip().removesuffix(".yaml")
-                for v in (sel.selected or [])
-            ]
+        def _selected_names(sel: SelectionList[int]) -> list[str]:
+            return [str(v) for v in (sel.selected or [])]
 
-        self.selected_modules = _selected_names(modules_select)
-        self.selected_scripts = _selected_names(scripts_select)
-        self.dependencies = []
-        self._get_dependencies("modules")
-        self._get_dependencies("scripts")
+        self.selected_packages = _selected_names(package_select)  # type: ignore
         self.query_one(Markdown).update(self._construct_markdown())
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
-            case "next-btn-modules":
-                self.query_one("#next-btn-scripts").focus()
+            case "next-btn-packages":
+                self.query_one("#install-btn").focus()
             case "next-btn-scripts":
                 self.query_one("#install-btn").focus()
             case "back-btn-scripts":
-                self.query_one("#next-btn-modules").focus()
+                self.query_one("#next-btn-packages").focus()
             case "back-btn-install":
-                self.query_one("#next-btn-scripts").focus()
+                self.query_one("#next-btn-packages").focus()
             case "install-btn":
-                self.ctx.scripts_to_run = list(self.selected_scripts)
-                self.ctx.modules_to_install = list(self.selected_modules)
                 self.app.exit(str(event.button))
+            case _:
+                pass
 
-    def _construct_widgets(self, widget_type) -> tuple:
-        widgets = []
-        platform_instructions = get_platform_instructions()
-        for m in self.modules if widget_type == "modules" else self.scripts:
-            actions = m.get("content", {}).get("actions", {})
-            actions = actions.get("install", actions)
-            steps = platform_instructions.resolve(actions)
-            if not steps:
+    def _construct_widgets(
+        self,
+    ) -> tuple[tuple[str, int, bool], ...]:
+        widgets: list[tuple[str, int, bool]] = []
+        selected_profile = self.ctx.selected_profile
+        selected_packages: list[Package] = (
+            selected_profile.packages[self.ctx.os] if selected_profile else []
+        )
+        for idx, p in enumerate(self.ctx.available_packages):
+            if self.ctx.os not in p.supported_os:
                 continue
-
-            widgets.append(
-                (
-                    m["content"]["name"].capitalize(),
-                    m["filename"],
-                    (
-                        True
-                        if m["filename"].removesuffix(".yaml")
-                        in (
-                            self.pre_selected_modules
-                            if widget_type == "modules"
-                            else self.pre_selected_scripts
-                        )
-                        else False
-                    ),
-                )
-            )
+            else:
+                widgets.append((p.name, idx, p in selected_packages))
         return tuple(widgets)
 
     def _construct_markdown(self) -> str:
-        modules_md = "\n".join(f"- {m}" for m in self.selected_modules) or "None"
-        scripts_md = "\n".join(f"- {s}" for s in self.selected_scripts) or "None"
-        deps_md = "\n".join(f"- {d}" for d in self.dependencies) or "None"
+        # packages_md = "\n".join(f"- {m}" for  in self.selected_modules) or "None"
+        # scripts_md = "\n".join(f"- {s}" for s in self.selected_scripts) or "None"
+        # deps_md = "\n".join(f"- {d}" for d in self.dependencies) or "None"
 
-        return "\n".join(
-            [
-                "## Modules:",
-                modules_md,
-                "",
-                "## Scripts:",
-                scripts_md,
-                "",
-                "## Dependencies:",
-                deps_md,
-            ]
-        )
-
-    def _resolve_dependencies(self, depends, dep_type="modules"):
-        """Resolve dependencies for a given type (modules or scripts).
-        Returns a list of dependency names."""
-        if not depends:
-            return []
-        if isinstance(depends, dict):
-            # Extract the specific dependency type (modules or scripts)
-            dep_list = depends.get(dep_type, {})
-            if isinstance(dep_list, dict):
-                # It's platform-specific, resolve it
-                return get_platform_instructions().resolve(dep_list)
-            elif isinstance(dep_list, list):
-                return dep_list
-        return []
-
-    def _get_dependencies(self, dependency_type):
-        src = self.modules if dependency_type == "modules" else self.scripts
-        selected = (
-            self.selected_modules if dependency_type == "modules" else self.selected_scripts
-        )
-        for m in src:
-            filename = m.get("filename", "")
-            name = filename.removesuffix(".yaml") if filename else filename
-            if name not in selected:
-                continue
-            depends = m.get("content", {}).get("depends")
-            if not depends:
-                continue
-            # Get module dependencies
-            module_dependencies = self._resolve_dependencies(depends, "modules")
-            for d in module_dependencies:
-                if d not in self.dependencies:
-                    self.dependencies.append(d)
-            # Get script dependencies
-            script_dependencies = self._resolve_dependencies(depends, "scripts")
-            for d in script_dependencies:
-                if d not in self.dependencies:
-                    self.dependencies.append(d)
+        # return "\n".join(
+        #     [
+        #         "## Modules:",
+        #         modules_md,
+        #         "",
+        #         "## Scripts:",
+        #         scripts_md,
+        #         "",
+        #         "## Dependencies:",
+        #         deps_md,
+        #     ]
+        # )
+        return str(self.ctx.selected_profile.id) if self.ctx.selected_profile else ""

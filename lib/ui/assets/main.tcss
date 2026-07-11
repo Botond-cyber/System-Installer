@@ -4,7 +4,7 @@
     width: 100%;
 }
 
-.modules-pane {
+.package-pane {
     width: 1fr;
     height: 100%;
 }

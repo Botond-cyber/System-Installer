@@ -1,3 +1,4 @@
+from lib.core.platform import Platform
 from lib.models.package import Package
 from lib.models.profile import Profile
 
@@ -8,6 +9,7 @@ class Context:
         self.packages_from_profile: list[Package] = []
         self.available_packages: list[Package] = []
         self.available_profiles: list[Profile] = []
+        self.os:str = Platform.get_os()
 
         self.installed_packages: set[str] = set()
 
