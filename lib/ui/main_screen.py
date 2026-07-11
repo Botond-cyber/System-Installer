@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, cast
 
 from textual import on
 from textual.events import Mount
@@ -16,9 +16,9 @@ from textual.widgets import (
 from textual.containers import Vertical
 
 from lib.core.context import Context
+from lib.core.dependency_resolver import DependencyResolver
 from lib.core.engine import Engine
 from lib.core.resources import resource_path
-from lib.models.package import Package
 
 
 class MainScreen(Screen[Any]):
@@ -27,7 +27,8 @@ class MainScreen(Screen[Any]):
     def __init__(
         self, name: str | None = None, id: str | None = None, classes: str | None = None
     ) -> None:
-        self.selected_packages = []
+        self.selected_packages: list[str] = []
+        self.dependencies: set[str] = set()
         super().__init__(name, id, classes)
 
     @property
@@ -48,7 +49,7 @@ class MainScreen(Screen[Any]):
                 with Static(id="grid-container"):
                     with Static(classes="package-pane"):
                         packages = self._construct_widgets()
-                        yield SelectionList[int](*packages, id="package-select")
+                        yield SelectionList[str](*packages, id="package-select")
 
                     with Vertical(id="actions-pane"):
                         yield Button("Select all")
@@ -76,12 +77,10 @@ class MainScreen(Screen[Any]):
     def update_selected_view(
         self, event: Mount | SelectionList.SelectedChanged[Any]
     ) -> None:
-        package_select = self.query_one("#package-select", SelectionList)  # type: ignore
+        package_select = cast(SelectionList[str], self.query_one("#package-select", SelectionList))
 
-        def _selected_names(sel: SelectionList[int]) -> list[str]:
-            return [str(v) for v in (sel.selected or [])]
-
-        self.selected_packages = _selected_names(package_select)  # type: ignore
+        self.selected_packages = [str(v) for v in (package_select.selected or [])]
+        self.get_selected_dependencies()
         self.query_one(Markdown).update(self._construct_markdown())
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -99,34 +98,51 @@ class MainScreen(Screen[Any]):
 
     def _construct_widgets(
         self,
-    ) -> tuple[tuple[str, int, bool], ...]:
-        widgets: list[tuple[str, int, bool]] = []
+    ) -> tuple[tuple[str, str, bool], ...]:
+        widgets: list[tuple[str, str, bool]] = []
         selected_profile = self.ctx.selected_profile
-        selected_packages: list[Package] = (
-            selected_profile.packages[self.ctx.os] if selected_profile else []
+        selected_packages = set(
+            cast(list[str], selected_profile.packages[self.ctx.os] if selected_profile else [])
         )
-        for idx, p in enumerate(self.ctx.available_packages.values()):
+        for p in self.ctx.available_packages.values():
             if self.ctx.os not in p.supported_os:
                 continue
             else:
-                widgets.append((p.name, idx, p in selected_packages))
+                widgets.append((p.name, p.id, p.id in selected_packages))
         return tuple(widgets)
 
-    def _construct_markdown(self) -> str:
-        # packages_md = "\n".join(f"- {m}" for  in self.selected_modules) or "None"
-        # scripts_md = "\n".join(f"- {s}" for s in self.selected_scripts) or "None"
-        # deps_md = "\n".join(f"- {d}" for d in self.dependencies) or "None"
+    def get_selected_dependencies(self):
+        self.dependencies.clear()
+        for s in self.selected_packages:
+            deps = DependencyResolver.resolve(self.ctx, s)
+            for d in deps:
+                if d != s:
+                    self.dependencies.add(d)
 
-        # return "\n".join(
-        #     [
-        #         "## Modules:",
-        #         modules_md,
-        #         "",
-        #         "## Scripts:",
-        #         scripts_md,
-        #         "",
-        #         "## Dependencies:",
-        #         deps_md,
-        #     ]
-        # )
-        return str(self.ctx.selected_profile.id) if self.ctx.selected_profile else ""
+    def _construct_markdown(self) -> str:
+        packages_md = (
+            "\n".join(
+                f"- {self.ctx.available_packages[p].name}"
+                for p in self.selected_packages
+                if p in self.ctx.available_packages
+            )
+            or "None"
+        )
+        deps_md = (
+            "\n".join(
+                f"- {self.ctx.available_packages[d].name}"
+                for d in self.dependencies
+                if d in self.ctx.available_packages
+            )
+            or "None"
+        )
+
+        return "\n".join(
+            [
+                "## Packages:",
+                packages_md,
+                "",
+                "## Dependencies:",
+                deps_md,
+            ]
+        )
