@@ -1,0 +1,21 @@
+package_schema_version: 1
+
+name: Windows Terminal
+id: win_terminal
+version: 1
+description: A good terminal emulator for windows
+type: app
+tags:
+  - development
+  - terminal
+
+supported_os:
+  - windows
+
+check:
+  windows:
+    - idk how to check on windows
+
+install:
+  windows:
+    - winget install --id Microsoft.WindowsTerminal --silent --accept-package-agreements --no-upgrade --scope user

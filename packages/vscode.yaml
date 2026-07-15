@@ -1,0 +1,30 @@
+package_schema_version: 1
+
+name: Visual Studio Code
+id: vscode
+version: 1
+description: Visual Studio Code code editor
+type: app
+tags:
+  - development
+  - code_editor
+
+supported_os:
+  - fedora
+  - windows
+
+check:
+  fedora:
+    - code -v
+  windows:
+    - idk how to check on windows
+
+install:
+  fedora:
+    - sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc &&
+    - echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\nautorefresh=1\ntype=rpm-md\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.repos.d/vscode.repo > /dev/null
+    - dnf check-update &&
+    - sudo dnf install code
+
+  windows:
+    - winget install --id Microsoft.VisualStudioCode --silent --accept-package-agreements --no-upgrade --scope user

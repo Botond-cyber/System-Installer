@@ -18,7 +18,6 @@ packages:
     - vscode
 
   fedora:
-    - fedora-tools
 
   windows:
-    - windows-tools
+    - win_terminal

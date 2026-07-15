@@ -15,3 +15,13 @@ class Profile:
         self.author: str | None = profile.get("author")
         self.tags: list[str] = profile.get("tags", [])
         self.description: str | None = profile.get("description")
+
+    def get_packages(self, os: str) -> list[str]:
+        packages: set[str] = set()
+        if self.packages.get("all"):
+            for p in self.packages["all"]:
+                packages.add(p)
+        if self.packages.get(os):
+            for p in self.packages[os]:
+                packages.add(p)
+        return list(packages)

@@ -14,8 +14,8 @@ supported_os:
 
 packages:
   all:
-    - git
+    - flutter
     - vscode
 
   windows:
-    - windows-tools
+    - win_terminal

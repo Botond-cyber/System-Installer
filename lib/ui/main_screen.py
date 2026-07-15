@@ -77,7 +77,9 @@ class MainScreen(Screen[Any]):
     def update_selected_view(
         self, event: Mount | SelectionList.SelectedChanged[Any]
     ) -> None:
-        package_select = cast(SelectionList[str], self.query_one("#package-select", SelectionList))
+        package_select = cast(
+            SelectionList[str], self.query_one("#package-select", SelectionList)
+        )
 
         self.selected_packages = [str(v) for v in (package_select.selected or [])]
         self.get_selected_dependencies()
@@ -102,7 +104,7 @@ class MainScreen(Screen[Any]):
         widgets: list[tuple[str, str, bool]] = []
         selected_profile = self.ctx.selected_profile
         selected_packages = set(
-            cast(list[str], selected_profile.packages[self.ctx.os] if selected_profile else [])
+            selected_profile.get_packages(self.ctx.os) if selected_profile else [],
         )
         for p in self.ctx.available_packages.values():
             if self.ctx.os not in p.supported_os:
