@@ -28,6 +28,7 @@ def main():
     app = InstallerApp(ctx, engine)
     app.run()
     subprocess.run("cls" if name == "nt" else "clear", shell=True)
+    engine.run()
 
 
 if __name__ == "__main__":

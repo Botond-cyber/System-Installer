@@ -14,9 +14,7 @@ dependencies:
   windows:
     - git
 supported_os:
-  - fedora
-  - windows
-
+  - disabeled
 check:
   fedora:
     - git -v

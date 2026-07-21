@@ -14,11 +14,18 @@ supported_os:
   - windows
 
 check:
-  fedora:
-    - code -v
-  windows:
-    - idk how to check on windows
-
+  fedora: |
+    if command -v code >/dev/null 2>&1; then
+      echo true
+    else
+      echo false
+    fi
+  windows: |
+    if (Get-Command code -ErrorAction SilentlyContinue) {
+      Write-Output true
+    } else {
+      Write-Output false
+    }
 install:
   fedora:
     - sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc &&

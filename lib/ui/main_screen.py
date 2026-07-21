@@ -94,6 +94,7 @@ class MainScreen(Screen[Any]):
             case "back-btn-install":
                 self.query_one("#next-btn-packages").focus()
             case "install-btn":
+                self.ctx.packages_to_install = self.selected_packages
                 self.app.exit(str(event.button))
             case _:
                 pass

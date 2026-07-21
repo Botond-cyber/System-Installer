@@ -13,10 +13,18 @@ supported_os:
   - windows
 
 check:
-  fedora:
-    - git -v
-  windows:
-    - git -v
+  fedora: |
+    if command -v git >/dev/null 2>&1; then
+      echo true
+    else
+      echo false
+    fi
+  windows: |
+    if (Get-Command git -ErrorAction SilentlyContinue) {
+      Write-Output true
+    } else {
+      Write-Output false
+    }
 
 install:
   fedora:

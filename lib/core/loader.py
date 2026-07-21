@@ -1,9 +1,13 @@
 import yaml
 from os import listdir, path
 
+from lib.core.context import Context
 from lib.core.resources import resource_path
 from lib.models.package import Package
 from lib.models.profile import Profile
+
+INSTALLFILEPATHWINODWS = ""
+INSTALLFILEPATHLINUX = ""
 
 
 class Loader:
@@ -34,3 +38,13 @@ class Loader:
     def load_package(file_path: str) -> Package:
         with open(resource_path(file_path), "r") as f:
             return Package(yaml.safe_load(f))
+
+    @staticmethod
+    def load_installation_history(ctx: Context) -> list[str]:
+        try:
+            file = yaml.safe_load(
+                INSTALLFILEPATHWINODWS if ctx.os == "windows" else INSTALLFILEPATHLINUX
+            )
+            return file["Packages"]
+        except:
+            return []
