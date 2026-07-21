@@ -2,6 +2,7 @@ import subprocess
 
 from lib.core.context import Context
 from lib.core.loader import Loader
+from lib.core.logger import Logger
 from lib.models.package import Package
 
 
@@ -16,18 +17,27 @@ class Engine:
             self.ctx.mark_installed(i)
 
         for p in self.ctx.packages_to_install:
-            print(p)
             if self.check_if_installed(p):
                 continue
+            self.install(p)
+        Logger.generate_installed_packages_file(self.ctx)
 
-    def install(self):
-        pass
+    def install(self, package_id: str):
+        package: Package = self.ctx.available_packages[package_id]
+        for i in package.install[self.ctx.os]:
+            print(i)
 
-    def configure(self):
-        pass
+    def configure(self, package_id: str):
+        package: Package = self.ctx.available_packages[package_id]
+        for i in package.configure[self.ctx.os]:
+            print(i)
 
     def check_if_installed(self, package_id: str):
+        if self.ctx.is_installed(package_id):
+            return True
+
         package: Package = self.ctx.available_packages[package_id]
+
         try:
             res = subprocess.run(
                 str(package.check[self.ctx.os]),
@@ -36,7 +46,12 @@ class Engine:
                 text=True,
             )
             output = res.stdout.strip()
-            print(output)
-            return True if output == "true" else False
+
+            if output == "true":
+                self.ctx.mark_installed(package_id)
+                return True
+            else:
+                return False
+
         except:
             return False
