@@ -15,10 +15,8 @@ class Engine:
 
     # main method for running the installer
     def run(self):
-        print(self.ctx.packages_to_install)
         self.logger.write_to_log_file(f"Packages selected: {self.ctx.packages_to_install}")
         for i in Loader.load_installation_history(self.ctx):  # loads already installed packages form file
-            print(i)
             self.ctx.mark_installed(i)
 
         resolved_packages: list[str] = []  # resolves dependencies
@@ -28,6 +26,7 @@ class Engine:
                     resolved_packages.append(resolved_package)
 
         self.logger.write_to_log_file(f"Packages to install: {resolved_packages}")
+        print(f"Installing: {resolved_packages}")
 
         for package_id in resolved_packages:  # runs install and configure functions on all the packages
             self.install(package_id)
@@ -41,9 +40,11 @@ class Engine:
         package: Package = self.ctx.available_packages[package_id]
         if package.install.get(self.ctx.os):
             self.logger.write_to_log_file(f"Installing: {package_id} ...")
+            print(f"Installing: {package_id} ...")
 
             if self.check_if_installed(package_id):
                 self.logger.write_to_log_file(f"Already installed: {package_id} ✅")
+                print(f"Already installed: {package_id} ✅")
                 return
             try:
                 for i in package.install[self.ctx.os]:
@@ -53,17 +54,19 @@ class Engine:
                         subprocess.run(
                             str(i),
                             shell=True,
-                            capture_output=True,
                             text=True,
+                            check=True,
                         )
             except Exception as e:
                 print(f"failed to install: {package_id}\n{e} ")
                 self.logger.write_to_log_file(f"Failed to install: {package_id} ❌\n\tReason: {e}")
+                print(f"Failed to install: {package_id} ❌\n\tReason: {e}")
                 return
 
             else:
                 self.ctx.mark_installed(package_id)
                 self.logger.write_to_log_file(f"Successfully installed: {package_id} ✅")
+                print(f"Successfully installed: {package_id} ✅")
                 return
         return
 
@@ -72,6 +75,7 @@ class Engine:
         package: Package = self.ctx.available_packages[package_id]
         if package.configure.get(self.ctx.os):
             self.logger.write_to_log_file(f"Configuring: {package_id} ...")
+            print(f"Configuring: {package_id} ...")
             try:
                 for i in package.configure[self.ctx.os]:
                     if self.ctx.dry_run == True:
@@ -80,15 +84,17 @@ class Engine:
                         subprocess.run(
                             str(i),
                             shell=True,
-                            capture_output=True,
                             text=True,
+                            check=True,
                         )
 
             except Exception as e:
                 print(f"Failed to configure: {package_id}\n{e}")
                 self.logger.write_to_log_file(f"Failed to configure: {package_id} ❌\n\tReason: {e}")
+                print(f"Failed to configure: {package_id} ❌\n\tReason: {e}")
             else:
                 self.logger.write_to_log_file(f"Successfully configured: {package_id} ✅")
+                print(f"Successfully configured: {package_id} ✅")
 
     # checks if package is already installed
     def check_if_installed(self, package_id: str):
