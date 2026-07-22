@@ -19,7 +19,12 @@ class Engine:
         for p in self.ctx.packages_to_install:
             if self.check_if_installed(p):
                 continue
-            self.install(p)
+            try:
+                self.install(p)
+            except Exception as e:
+                print(f"failed to install: {p}\n{e} ")
+            else:
+                self.ctx.mark_installed(p)
         Logger.generate_installed_packages_file(self.ctx)
 
     def install(self, package_id: str):
@@ -52,6 +57,5 @@ class Engine:
                 return True
             else:
                 return False
-
         except:
             return False

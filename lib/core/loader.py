@@ -6,9 +6,6 @@ from lib.core.resources import resource_path
 from lib.models.package import Package
 from lib.models.profile import Profile
 
-# INSTALLFILEPATHWINODWS = path.join(path.expanduser("~"), ".system-installer")
-# INSTALLFILEPATHLINUX = path.join(path.expanduser("~"), ".system-installer")
-
 
 class Loader:
     @staticmethod
