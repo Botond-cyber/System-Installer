@@ -1,10 +1,18 @@
 IntroScreen {
     align: center middle;
 }
-RadioSet{
-    margin-top:1;
-    width: auto;
+
+#logo {
+    width: 100%;
+    content-align: center middle;
+    margin-bottom: 2;
 }
-RadioButton{
-    width: 60;
+
+#button-container {
+    width: 100%;
+    height: auto;
+    align: center middle;
+}
+Button{
+    width: 25;
 }

@@ -7,8 +7,8 @@ from lib.core.resources import resource_path
 from lib.ui.assets.title import title
 
 
-class IntroScreen(Screen[None]):
-    CSS_PATH = resource_path("ui/assets/intro.tcss")
+class ProfileSelectorScreen(Screen[None]):
+    CSS_PATH = resource_path("ui/assets/profile_selector.tcss")
 
     @property
     def ctx(self) -> Context:
