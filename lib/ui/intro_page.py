@@ -14,17 +14,6 @@ class IntroScreen(Screen[None]):
     def ctx(self) -> Context:
         return self.app.ctx  # type: ignore
 
-    async def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
-        self.ctx.selected_profile = next(
-            (
-                profile
-                for profile in self.ctx.available_profiles
-                if profile.name == event.pressed.label.plain
-            ),
-            None,
-        )
-        await self.app.switch_screen("main_screen")  # type: ignore
-
     # Return UI
     def compose(self) -> ComposeResult:
         yield Label(title)
@@ -33,3 +22,11 @@ class IntroScreen(Screen[None]):
             for p in self.ctx.available_profiles:
                 yield RadioButton(p.name, id=p.id)
             yield RadioButton("Custom")
+
+    # Event listener for radio buttons
+    async def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
+        self.ctx.selected_profile = next(
+            (profile for profile in self.ctx.available_profiles if profile.name == event.pressed.label.plain),
+            None,
+        )
+        await self.app.switch_screen("main_screen")  # type: ignore

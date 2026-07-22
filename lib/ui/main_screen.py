@@ -41,6 +41,7 @@ class MainScreen(Screen[Any]):
     def engine(self) -> Engine:
         return self.app.engine  # type: ignore[attr-defined]
 
+    # Return UI
     def compose(self) -> ComposeResult:
         with TabbedContent():
             with TabPane(title="Packages"):
@@ -66,10 +67,12 @@ class MainScreen(Screen[Any]):
 
         yield Footer()
 
+    # Add border titles
     def on_mount(self) -> None:
         self.query_one("#package-select").border_title = "Choose modules to install:"
         self.query_one(Markdown).border_title = "Selected modules and scripts:"
 
+    # Event listeners
     @on(Mount)
     @on(SelectionList.SelectedChanged)
     def update_selected_view(self, event: Mount | SelectionList.SelectedChanged[Any]) -> None:
@@ -79,6 +82,7 @@ class MainScreen(Screen[Any]):
         self.get_selected_dependencies()
         self.query_one(Markdown).update(self._construct_markdown())
 
+    # Button event handlers
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
             case "next-btn-packages":
@@ -104,6 +108,7 @@ class MainScreen(Screen[Any]):
             case _:
                 pass
 
+    # Construct widgets for selection list
     def _construct_widgets(
         self,
     ) -> tuple[tuple[str, str, bool], ...]:
@@ -121,6 +126,7 @@ class MainScreen(Screen[Any]):
                     self.ctx.packages_from_profile.add(p.id)
         return tuple(widgets)
 
+    # Get dependencies to show on second page
     def get_selected_dependencies(self):
         self.dependencies.clear()
         for s in self.selected_packages:
@@ -129,6 +135,7 @@ class MainScreen(Screen[Any]):
                 if d != s:
                     self.dependencies.add(d)
 
+    # Construct markdown for the second page
     def _construct_markdown(self) -> str:
         packages_md = (
             "\n".join(

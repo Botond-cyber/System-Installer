@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 
+from lib.core.logger import Logger
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 
@@ -19,11 +21,10 @@ PROFILE_DIRECTORY = "../profiles/"
 
 def main():
     ctx = Context()
-    engine = Engine(ctx)
+    logger = Logger()
+    engine = Engine(ctx, logger)
 
-    ctx.available_packages = {
-        package.id: package for package in Loader.load_packages(PACKAGE_DIRECTORY)
-    }
+    ctx.available_packages = {package.id: package for package in Loader.load_packages(PACKAGE_DIRECTORY)}
     ctx.available_profiles = Loader.loadProfiles(PROFILE_DIRECTORY)
     app = InstallerApp(ctx, engine)
     app.run()

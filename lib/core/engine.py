@@ -8,9 +8,9 @@ from lib.models.package import Package
 
 
 class Engine:
-    def __init__(self, ctx: Context) -> None:
+    def __init__(self, ctx: Context, logger: Logger) -> None:
         self.ctx = ctx
-        self.logger = Logger()
+        self.logger = logger
         pass
 
     # main method for running the installer
