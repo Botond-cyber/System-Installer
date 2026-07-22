@@ -34,20 +34,26 @@ class Engine:
                 print(f"failed to install: {package_id}\n{e} ")
             else:
                 self.ctx.mark_installed(package_id)
-                self.configure(package_id)
+                try:
+                    self.configure(package_id)
+                except Exception as e:
+                    print(f"failed to configure: {package_id}\n{e}")
         Logger.generate_installed_packages_file(self.ctx)
+        input("PRESS ANY KEY TO EXIT...")
 
     # package installer method
     def install(self, package_id: str):
         package: Package = self.ctx.available_packages[package_id]
-        for i in package.install[self.ctx.os]:
-            print(i)
+        if package.install.get(self.ctx.os):
+            for i in package.install[self.ctx.os]:
+                print(i)
 
     # package configure method
     def configure(self, package_id: str):
         package: Package = self.ctx.available_packages[package_id]
-        for i in package.configure[self.ctx.os]:
-            print(i)
+        if package.configure.get(self.ctx.os):
+            for i in package.configure[self.ctx.os]:
+                print(i)
 
     # checks if package is already installed
     def check_if_installed(self, package_id: str):
