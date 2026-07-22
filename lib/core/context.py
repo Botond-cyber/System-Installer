@@ -15,6 +15,8 @@ class Context:
 
         self.selected_profile: Profile | None = None
 
+        self.dry_run: bool = False
+
     def mark_installed(self, package_id: str) -> None:
         self.installed_packages.add(package_id)
 

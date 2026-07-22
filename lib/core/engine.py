@@ -47,7 +47,15 @@ class Engine:
                 return
             try:
                 for i in package.install[self.ctx.os]:
-                    print(i)
+                    if self.ctx.dry_run == True:
+                        print(i)
+                    else:
+                        subprocess.run(
+                            str(i),
+                            shell=True,
+                            capture_output=True,
+                            text=True,
+                        )
             except Exception as e:
                 print(f"failed to install: {package_id}\n{e} ")
                 self.logger.write_to_log_file(f"Failed to install: {package_id} ❌\n\tReason: {e}")
@@ -66,7 +74,16 @@ class Engine:
             self.logger.write_to_log_file(f"Configuring: {package_id} ...")
             try:
                 for i in package.configure[self.ctx.os]:
-                    print(i)
+                    if self.ctx.dry_run == True:
+                        print(i)
+                    else:
+                        subprocess.run(
+                            str(i),
+                            shell=True,
+                            capture_output=True,
+                            text=True,
+                        )
+
             except Exception as e:
                 print(f"Failed to configure: {package_id}\n{e}")
                 self.logger.write_to_log_file(f"Failed to configure: {package_id} ❌\n\tReason: {e}")
