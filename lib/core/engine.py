@@ -14,8 +14,8 @@ class Engine:
     def run(self):
         print(self.ctx.packages_to_install)
         for i in Loader.load_installation_history(self.ctx):
+            print(i)
             self.ctx.mark_installed(i)
-
         for p in self.ctx.packages_to_install:
             if self.check_if_installed(p):
                 continue

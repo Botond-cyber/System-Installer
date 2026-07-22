@@ -6,8 +6,8 @@ from lib.core.resources import resource_path
 from lib.models.package import Package
 from lib.models.profile import Profile
 
-INSTALLFILEPATHWINODWS = ""
-INSTALLFILEPATHLINUX = ""
+# INSTALLFILEPATHWINODWS = path.join(path.expanduser("~"), ".system-installer")
+# INSTALLFILEPATHLINUX = path.join(path.expanduser("~"), ".system-installer")
 
 
 class Loader:
@@ -42,9 +42,10 @@ class Loader:
     @staticmethod
     def load_installation_history(ctx: Context) -> list[str]:
         try:
-            file = yaml.safe_load(
-                INSTALLFILEPATHWINODWS if ctx.os == "windows" else INSTALLFILEPATHLINUX
-            )
+            with open(path.join(path.expanduser("~"), ".system-installer"), "r") as f:
+                file = yaml.safe_load(f)
+            print(f"loader: {file['Packages']}")
             return file["Packages"]
         except:
+            print("error")
             return []
