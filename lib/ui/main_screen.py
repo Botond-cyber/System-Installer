@@ -50,9 +50,9 @@ class MainScreen(Screen[Any]):
                         yield SelectionList[str](*packages, id="package-select")
 
                     with Vertical(id="actions-pane"):
-                        yield Button("Select all")
-                        yield Button("Deselect all")
-                        yield Button("Reset")
+                        yield Button("Select all", id="select-all-btn")
+                        yield Button("Deselect all", id="deselect-all-btn")
+                        yield Button("Reset", id="reset-btn")
                         yield Button("Next->", id="next-btn-packages")
 
             with TabPane(title="Overview", id="install"):
@@ -90,6 +90,17 @@ class MainScreen(Screen[Any]):
             case "install-btn":
                 self.ctx.packages_to_install = self.selected_packages
                 self.app.exit(str(event.button))
+            case "select-all-btn":
+                self.query_one("#package-select", SelectionList).select_all()  # type: ignore
+            case "deselect-all-btn":
+                self.query_one("#package-select", SelectionList).deselect_all()  # type: ignore
+            case "reset-btn":
+                selection_list = self.query_one("#package-select", SelectionList)  # type: ignore
+                for package_id in (package_id for _, package_id, _ in self._construct_widgets()):
+                    if package_id in self.ctx.packages_from_profile:
+                        selection_list.select(package_id)  # type: ignore
+                    else:
+                        selection_list.deselect(package_id)  # type: ignore
             case _:
                 pass
 
@@ -106,6 +117,8 @@ class MainScreen(Screen[Any]):
                 continue
             else:
                 widgets.append((p.name, p.id, p.id in selected_packages))
+                if p.id in selected_packages:
+                    self.ctx.packages_from_profile.add(p.id)
         return tuple(widgets)
 
     def get_selected_dependencies(self):
