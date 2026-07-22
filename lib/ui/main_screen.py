@@ -24,9 +24,7 @@ from lib.core.resources import resource_path
 class MainScreen(Screen[Any]):
     CSS_PATH = resource_path("ui/assets/main.tcss")
 
-    def __init__(
-        self, name: str | None = None, id: str | None = None, classes: str | None = None
-    ) -> None:
+    def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
         self.selected_packages: list[str] = []
         self.dependencies: set[str] = set()
         super().__init__(name, id, classes)
@@ -74,12 +72,8 @@ class MainScreen(Screen[Any]):
 
     @on(Mount)
     @on(SelectionList.SelectedChanged)
-    def update_selected_view(
-        self, event: Mount | SelectionList.SelectedChanged[Any]
-    ) -> None:
-        package_select = cast(
-            SelectionList[str], self.query_one("#package-select", SelectionList)
-        )
+    def update_selected_view(self, event: Mount | SelectionList.SelectedChanged[Any]) -> None:
+        package_select = cast(SelectionList[str], self.query_one("#package-select", SelectionList))
 
         self.selected_packages = [str(v) for v in (package_select.selected or [])]
         self.get_selected_dependencies()

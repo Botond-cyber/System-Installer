@@ -13,8 +13,8 @@ supported_os:
   - windows
 
 check:
-  windows:
-    - idk how to check on windows
+  windows: |
+    [bool](Get-Command wt.exe -ErrorAction SilentlyContinue)
 
 install:
   windows:
