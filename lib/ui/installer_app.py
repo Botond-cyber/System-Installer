@@ -6,6 +6,7 @@ from textual.driver import Driver
 
 from lib.core.context import Context
 from lib.core.engine import Engine
+from lib.core.logger import Logger
 from lib.ui.screens.intro_screen import IntroScreen
 from lib.ui.screens.main_screen import MainScreen
 from lib.ui.screens.profile_selector_screen import ProfileSelectorScreen
@@ -15,6 +16,7 @@ from lib.ui.screens.settings_screen import SettingsScreen
 class InstallerApp(App[None]):
     def __init__(
         self,
+        logger: Logger,
         ctx: Context,
         engine: Engine,
         driver_class: type[Driver] | None = None,
@@ -25,6 +27,7 @@ class InstallerApp(App[None]):
         super().__init__(driver_class, css_path, watch_css, ansi_color)
         self.ctx = ctx
         self.engine = engine
+        self.logger = logger
 
     SCREENS = {
         "intro_screen": IntroScreen,

@@ -20,12 +20,19 @@ class Logger:
             if log.is_file():
                 log.unlink()
 
-    def __init__(self) -> None:
-        makedirs("logs", exist_ok=True)
-        self.log_file_path = path.join("logs", f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
-        with open(self.log_file_path, "w", encoding="utf-8") as f:
-            f.write(f"[{datetime.now().isoformat()}] Logger initialized\n")
+    @staticmethod
+    def delete_installed_packages_file():
+        Path(path.join(path.expanduser("~"), ".system-installer")).unlink(missing_ok=True)
 
-    def write_to_log_file(self, message: str):
-        with open(self.log_file_path, "a", encoding="utf-8") as f:
-            f.write(f"[{datetime.now().isoformat()}] {message}\n")
+    def __init__(self, ctx: Context) -> None:
+        self.ctx = ctx
+        if self.ctx.settings.enable_logging == True:
+            makedirs("logs", exist_ok=True)
+            self.log_file_path = path.join("logs", f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
+            with open(self.log_file_path, "w", encoding="utf-8") as f:
+                f.write(f"[{datetime.now().isoformat()}] Logger initialized\n")
+
+    def log_to_file(self, message: str):
+        if self.ctx.settings.enable_logging:
+            with open(self.log_file_path, "a", encoding="utf-8") as f:
+                f.write(f"[{datetime.now().isoformat()}] {message}\n")
