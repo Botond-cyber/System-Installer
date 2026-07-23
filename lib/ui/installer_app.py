@@ -6,9 +6,10 @@ from textual.driver import Driver
 
 from lib.core.context import Context
 from lib.core.engine import Engine
-from lib.ui.intro_screen import IntroScreen
-from lib.ui.main_screen import MainScreen
-from lib.ui.profile_selector_screen import ProfileSelectorScreen
+from lib.ui.screens.intro_screen import IntroScreen
+from lib.ui.screens.main_screen import MainScreen
+from lib.ui.screens.profile_selector_screen import ProfileSelectorScreen
+from lib.ui.screens.settings_screen import SettingsScreen
 
 
 class InstallerApp(App[None]):
@@ -25,7 +26,12 @@ class InstallerApp(App[None]):
         self.ctx = ctx
         self.engine = engine
 
-    SCREENS = {"intro_screen": IntroScreen, "main_screen": MainScreen, "profile_selector_screen": ProfileSelectorScreen}
+    SCREENS = {
+        "intro_screen": IntroScreen,
+        "main_screen": MainScreen,
+        "profile_selector_screen": ProfileSelectorScreen,
+        "settings_screen": SettingsScreen,
+    }
 
     async def on_mount(self) -> None:
         await self.push_screen("intro_screen")

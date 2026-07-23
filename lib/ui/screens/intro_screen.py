@@ -19,15 +19,17 @@ class IntroScreen(Screen[None]):
     def compose(self) -> ComposeResult:
         yield Label(title, id="logo")
         yield Vertical(
-            Button("Start installer", id="start"),
+            Button("Start installer", id="start_btn"),
             Button("Check installed packages", disabled=True),
-            Button("Settings", disabled=True),
+            Button("Settings", id="settings_btn"),
             id="button-container",
         )
 
     async def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
-            case "start":
+            case "start_btn":
                 await self.app.switch_screen("profile_selector_screen")  # type: ignore
+            case "settings_btn":
+                await self.app.switch_screen("settings_screen")  # type: ignore
             case _:
                 pass
