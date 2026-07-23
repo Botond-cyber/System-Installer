@@ -30,4 +30,4 @@ install:
   fedora:
     - sudo dnf install git
   windows:
-    - winget install --id Git.Git --silent --accept-package-agreements --no-upgrade --scope user
+    - winget install --id Git.Git --accept-package-agreements --no-upgrade --scope user

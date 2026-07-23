@@ -18,4 +18,4 @@ check:
 
 install:
   windows:
-    - winget install --id Microsoft.WindowsTerminal --silent --accept-package-agreements --no-upgrade --scope user
+    - winget install --id Microsoft.WindowsTerminal --accept-package-agreements --no-upgrade --scope user

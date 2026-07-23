@@ -34,4 +34,4 @@ install:
     - sudo dnf install code
 
   windows:
-    - winget install --id Microsoft.VisualStudioCode --silent --accept-package-agreements --no-upgrade --scope user
+    - winget install --id Microsoft.VisualStudioCode --accept-package-agreements --no-upgrade --scope user
