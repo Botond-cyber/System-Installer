@@ -1,9 +1,7 @@
 from datetime import datetime
 from os import makedirs, path
 from pathlib import Path
-
 import yaml
-
 from lib.core.context import Context
 
 
@@ -26,13 +24,22 @@ class Logger:
 
     def __init__(self, ctx: Context) -> None:
         self.ctx = ctx
-        if self.ctx.settings.enable_logging == True:
+        self.log_file_path = None
+        self._is_setup = False
+
+    def _setup_log_file(self):
+        """Creates the log directory and initial file only when needed."""
+        if not self._is_setup:
             makedirs("logs", exist_ok=True)
             self.log_file_path = path.join("logs", f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log")
             with open(self.log_file_path, "w", encoding="utf-8") as f:
                 f.write(f"[{datetime.now().isoformat()}] Logger initialized\n")
+            self._is_setup = True
 
     def log_to_file(self, message: str):
         if self.ctx.settings.enable_logging:
-            with open(self.log_file_path, "a", encoding="utf-8") as f:
-                f.write(f"[{datetime.now().isoformat()}] {message}\n")
+            self._setup_log_file()
+
+            if self.log_file_path is not None:
+                with open(self.log_file_path, "a", encoding="utf-8") as f:
+                    f.write(f"[{datetime.now().isoformat()}] {message}\n")
