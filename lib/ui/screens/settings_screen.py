@@ -12,6 +12,10 @@ from lib.core.settings import Settings
 
 
 class SettingsScreen(Screen[None]):
+    def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
+        self.refresh_times = 0
+        super().__init__(name, id, classes)
+
     CSS_PATH = resource_path("ui/assets/settings.tcss")
     BINDINGS = [
         ("escape", "switch_screen", "Back to main menu"),
@@ -91,14 +95,15 @@ class SettingsScreen(Screen[None]):
 
     # Set title on mount
     def on_mount(self) -> None:
-        self.logger.log_to_file("mount")
         self.title = "Settings"
+        self.original_settings = copy.deepcopy(self.ctx.settings)
 
     # Ensure UI refresh on reload
-    def on_screen_resume(self) -> None:
-        self.logger.log_to_file("mount")
-        self.original_settings = copy.deepcopy(self.ctx.settings)
-        self.refresh(recompose=True)
+    async def on_screen_resume(self) -> None:
+        if self.refresh_times > 0:
+            self.original_settings = copy.deepcopy(self.ctx.settings)
+            await self.recompose()
+        self.refresh_times += 1
 
     # Switch event listeners
     @on(Switch.Changed)

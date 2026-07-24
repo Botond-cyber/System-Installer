@@ -18,15 +18,20 @@ from textual.containers import Vertical
 from lib.core.context import Context
 from lib.core.dependency_resolver import DependencyResolver
 from lib.core.engine import Engine
+from lib.core.logger import Logger
 from lib.core.resources import resource_path
 
 
 class MainScreen(Screen[Any]):
     CSS_PATH = resource_path("ui/assets/main.tcss")
+    BINDINGS = [
+        ("escape", "switch_screen", "Back to main menu"),
+    ]
 
     def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
         self.selected_packages: list[str] = []
         self.dependencies: set[str] = set()
+        self.refresh_times = 0
         super().__init__(name, id, classes)
 
     @property
@@ -41,13 +46,17 @@ class MainScreen(Screen[Any]):
     def engine(self) -> Engine:
         return self.app.engine  # type: ignore[attr-defined]
 
+    @property
+    def logger(self) -> Logger:
+        return self.app.logger  # type: ignore
+
     # Return UI
     def compose(self) -> ComposeResult:
         with TabbedContent():
             with TabPane(title="Packages"):
                 with Static(id="grid-container"):
                     with Static(classes="package-pane"):
-                        packages = self._construct_widgets()
+                        packages = self.construct_widgets()
                         yield SelectionList[str](*packages, id="package-select")
 
                     with Vertical(id="actions-pane"):
@@ -75,12 +84,30 @@ class MainScreen(Screen[Any]):
     # Event listeners
     @on(Mount)
     @on(SelectionList.SelectedChanged)
-    def update_selected_view(self, event: Mount | SelectionList.SelectedChanged[Any]) -> None:
+    def update_selected_view(self) -> None:
+        self.logger.log_to_file("run")
         package_select = cast(SelectionList[str], self.query_one("#package-select", SelectionList))
 
         self.selected_packages = [str(v) for v in (package_select.selected or [])]
         self.get_selected_dependencies()
         self.query_one(Markdown).update(self._construct_markdown())
+
+    # Ensure UI refresh on reload by awaiting the new DOM
+    async def on_screen_resume(self) -> None:
+        if self.refresh_times > 0:
+            self.logger.log_to_file("resume")
+
+            await self.recompose()
+
+            self.query_one("#package-select").border_title = "Choose modules to install:"
+            self.query_one(Markdown).border_title = "Selected modules and scripts:"
+
+            self.update_selected_view()
+        self.refresh_times += 1
+
+    # Key bind actions
+    def action_switch_screen(self):
+        self.app.switch_screen("intro_screen")  # type: ignore
 
     # Button event handlers
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -100,7 +127,7 @@ class MainScreen(Screen[Any]):
                 self.query_one("#package-select", SelectionList).deselect_all()  # type: ignore
             case "reset-btn":
                 selection_list = self.query_one("#package-select", SelectionList)  # type: ignore
-                for package_id in (package_id for _, package_id, _ in self._construct_widgets()):
+                for package_id in (package_id for _, package_id, _ in self.construct_widgets()):
                     if package_id in self.ctx.packages_from_profile:
                         selection_list.select(package_id)  # type: ignore
                     else:
@@ -109,7 +136,7 @@ class MainScreen(Screen[Any]):
                 pass
 
     # Construct widgets for selection list
-    def _construct_widgets(
+    def construct_widgets(
         self,
     ) -> tuple[tuple[str, str, bool], ...]:
         widgets: list[tuple[str, str, bool]] = []
