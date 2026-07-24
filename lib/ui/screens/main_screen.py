@@ -26,6 +26,11 @@ class MainScreen(Screen[Any]):
     CSS_PATH = resource_path("ui/assets/main.tcss")
     BINDINGS = [
         ("escape", "switch_screen", "Back to main menu"),
+        ("d", "change_tab", "Change tab"),
+        ("a", "select_all", "Select all"),
+        ("r", "reset", "Reset"),
+        ("f", "deselect_all", "Deselect all"),
+        ("i", "install", "Install"),
     ]
 
     def __init__(self, name: str | None = None, id: str | None = None, classes: str | None = None) -> None:
@@ -53,7 +58,7 @@ class MainScreen(Screen[Any]):
     # Return UI
     def compose(self) -> ComposeResult:
         with TabbedContent():
-            with TabPane(title="Packages"):
+            with TabPane(title="Packages", id="select"):
                 with Static(id="grid-container"):
                     with Static(classes="package-pane"):
                         packages = self.construct_widgets()
@@ -109,6 +114,28 @@ class MainScreen(Screen[Any]):
     def action_switch_screen(self):
         self.app.switch_screen("intro_screen")  # type: ignore
 
+    def action_change_tab(self):
+        tabbed_content = self.query_one(TabbedContent)
+        match tabbed_content.active:
+            case "select":
+                tabbed_content.active = "install"
+            case "install":
+                tabbed_content.active = "select"
+            case _:
+                pass
+
+    def action_install(self):
+        self.install()
+
+    def action_select_all(self):
+        self.query_one("#package-select", SelectionList).select_all()  # type: ignore
+
+    def action_deselect_all(self):
+        self.query_one("#package-select", SelectionList).deselect_all()  # type: ignore
+
+    def action_reset(self):
+        self.reset()
+
     # Button event handlers
     def on_button_pressed(self, event: Button.Pressed) -> None:
         match event.button.id:
@@ -119,21 +146,30 @@ class MainScreen(Screen[Any]):
             case "back-btn-install":
                 self.query_one("#next-btn-packages").focus()
             case "install-btn":
-                self.ctx.packages_to_install = self.selected_packages
-                self.app.exit(str(event.button))
+                self.install()
             case "select-all-btn":
                 self.query_one("#package-select", SelectionList).select_all()  # type: ignore
             case "deselect-all-btn":
                 self.query_one("#package-select", SelectionList).deselect_all()  # type: ignore
             case "reset-btn":
-                selection_list = self.query_one("#package-select", SelectionList)  # type: ignore
-                for package_id in (package_id for _, package_id, _ in self.construct_widgets()):
-                    if package_id in self.ctx.packages_from_profile:
-                        selection_list.select(package_id)  # type: ignore
-                    else:
-                        selection_list.deselect(package_id)  # type: ignore
+                self.reset()
             case _:
                 pass
+
+    # Install function
+    def install(self):
+        self.ctx.packages_to_install = self.selected_packages
+        self.logger.log_to_file("Install stated")
+        self.app.exit()
+
+    # Reset function
+    def reset(self):
+        selection_list = self.query_one("#package-select", SelectionList)  # type: ignore
+        for package_id in (package_id for _, package_id, _ in self.construct_widgets()):
+            if package_id in self.ctx.packages_from_profile:
+                selection_list.select(package_id)  # type: ignore
+            else:
+                selection_list.deselect(package_id)  # type: ignore
 
     # Construct widgets for selection list
     def construct_widgets(
